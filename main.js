@@ -29,445 +29,354 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-task2:
+task4
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Standard Chartered</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Feedback — Showcase</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
+        :root {
+            --light-mint: #b7f0e7;
+            --main-teal: #23b2a9;
+            --main-blue: #0f7bd6;
+            --button-positive: #2fc04e;
+            --badge-dark-blue: #0b64c7;
+        }
+
         body {
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            background: #000;
-            color: white;
-            overflow-x: hidden;
-            height: 100vh;
+            font-family: "Poppins", "Segoe UI", Arial;
+            background: #fff;
+            color: #222;
+            padding: 24px;
         }
 
-        .top-nav {
-            position: absolute;
-            right: 5px;
-            background: rgba(3, 2, 2, 0.726);
-            backdrop-filter: blur(10px);
-            border-bottom-left-radius: 12px;
-            gap: 15px;
-            padding: 8px 20px;
-            z-index: 1000;
-            width: 600px;
+        /* Outer form box */
+        .feedback-form-box {
+            border: 2px solid var(--main-teal);
+            padding: 18px;
+            max-width: 800px;
+            margin-bottom: 28px;
         }
 
-        .top-nav a {
-            color: white;
-            text-decoration: none;
-            padding: 6px 12px;
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
-            transition: color 0.3s;
-            font-size: 11.5px;
-            white-space: nowrap;
-        }
-
-        .top-nav a:last-child {
-            border-right: none;
-        }
-
-        .top-nav a:hover {
-            color: #00a651;
-        }
-
-        .main-navbar {
-            position: absolute;
-            padding-top: 22px;
-            display: flex;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            z-index: 999;
-            width: 92rem;
-            margin: 0 40px;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            margin-left: 80px;
-            margin-right: 10px;
-        }
-
-        .logo-text {
-            font-size: 16px;
-            font-weight: 400;
-            color: #333;
-            line-height: 1.1;
-        }
-
-        .logo-text strong {
-            font-weight: 600;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 60px;
-            flex: 1;
-            margin-left: -225px;
-            margin-right: 25px;
-            justify-content: flex-end;
-        }
-
-        .nav-link {
-            color: #000 !important;
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 500;
-            transition: color 0.3s;
-            white-space: nowrap;
-        }
-
-        .nav-link:hover {
-            color: #00a651 !important;
-        }
-
-        .search-icon {
-            font-size: 20px;
-            color: blue;
-            cursor: pointer;
-            transition: color 0.3s;
-            margin-left: -45px;
-        }
-
-        .search-icon:hover {
-            color: #00a651;
-        }
-
-        .hero {
-            height: 100vh;
-            background:
-                linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-                url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-            background-size: cover;
-            background-position: center;
+        /* label badges on left */
+        .info-label {
+            background: var(--badge-dark-blue);
+            color: #fff;
+            padding: 12px 18px;
+            font-size: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            height: 100%;
+            min-width: 110px;
+        }
+
+        /* inputs style */
+        .text-input-field {
+            border: 3px solid var(--main-teal);
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.02);
+            font-size: 1.05rem;
+            color: #a99b9bd2;
+            min-height: 48px;
+        }
+        .text-input-field::placeholder{
+            font-size: 2.2rem;
+            color: #888;
+            display: flex;
             text-align: center;
-            padding: 0 20px;
+            justify-content: center;
+        }
+
+        .action-button {
+            background: var(--button-positive);
+            color: #fff;
+            border: 2px solid black;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            min-width: 120px;
+            display: block;
+            margin: 18px auto 0;
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+        }
+
+        /* Feedback display area */
+        .feedback-display-area {
+            border: 2px solid #bdbdbd;
+            padding: 18px;
+        }
+
+        .feedback-display-area h3 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        /* The inner feedback card */
+        .feedback-card {
+            background: #fff;
+            border: 3px solid var(--main-teal);
+            border-radius: 28px;
+            padding: 22px 28px;
             position: relative;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .hero-content {
-            max-width: 800px;
-            margin-top: 80px;
+        .feedback-card .user-name {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #333;
         }
 
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 400;
-            margin-bottom: 25px;
-            line-height: 1.2;
-        }
-
-        .hero h1 .blue {
-            display: inline-block;
-            width: 25px;
-            height: 24px;
-            background-color: blue;
-            border-radius: 100% 0 100% 100%;
-            transform: rotate(45deg);
-            vertical-align: middle;
-        }
-
-        .hero h1 .green {
-            display: inline-block;
-            width: 25px;
-            height: 25px;
-            background-color: #00a651;
-            border-radius: 50% 0 50% 50%;
-            transform: rotate(220deg);
-            vertical-align: middle;
-        }
-
-        .hero p {
-            font-size: 20px;
-            margin-bottom: 35px;
-            color: rgba(255, 255, 255, 0.9);
+        .feedback-card .user-message {
+            font-size: 1.5rem;
+            margin-left: 40px;
+            color: #555;
             line-height: 1.6;
         }
 
-        .btn-learn {
-            background: #007bff;
-            color: white;
-            padding: 14px 40px;
-            font-weight: bold;
-            font-size: 18px;
-            border-radius: 30px;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s;
-            border: none;
-        }
-
-        .btn-learn span {
-            margin-left: 20px;
-        }
-
-        .btn-learn:hover {
-            background: #0056b3;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 123, 255, 0.3);
-        }
-
-        .green-circle {
+        /* Modify/Remove control (top-right) */
+        .control-pill {
             position: absolute;
-            bottom: 30px;
-            left: 30px;
-            width: 60px;
-            height: 60px;
-            background: #00a651;
-            border-radius: 50%;
-            z-index: 100;
-            opacity: 0.8;
+            right: 18px;
+            top: 6px;
+            border: 2px solid black;
+            background: var(--button-positive);
+            color: #fff;
+            padding: 1px 25px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+            font-size: 1.5rem;
         }
 
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: #333;
-            font-size: 20px;
-            padding: 5px;
-        }
-
-        .mobile-nav {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            z-index: 2000;
-            padding: 20px;
-            overflow: scroll;
-        }
-
-        .mobile-nav.active {
+        .control-pill small {
             display: block;
+            font-size: 1.5rem;
+            line-height: 1;
         }
 
-        .mobile-nav-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .mobile-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #333;
-        }
-
-        .mobile-nav-links {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .mobile-nav-links a {
-            color: #333;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 500;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        @media (max-width: 1516px) {
-            .top-nav {
-                display: none;
+        /* Responsive tweaks to match screenshot feeling */
+        @media (max-width: 767px) {
+            .info-label {
+                min-width: 90px;
+                font-size: 0.95rem;
+                padding: 8px;
             }
 
-            .main-navbar {
-                top: 20px;
-                padding: 15px 20px;
-                width: calc(100% - 40px);
-                max-width: none;
-                margin: 0 20px;
-            }
-
-            .logo-container {
-                margin-left: 0;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .mobile-menu-btn {
-                display: block;
-                margin-left: auto;
-            }
-
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-
-            .mobile-res {
-                display: none;
-            }
-
-            .hero p {
+            .text-input-field {
                 font-size: 1rem;
             }
 
-            .btn-learn {
-                padding: 12px 25px;
-                font-size: 14px;
+            .feedback-card {
+                border-radius: 18px;
+                padding: 16px;
             }
 
-            .green-circle {
-                width: 40px;
-                height: 40px;
-                bottom: 20px;
-                left: 20px;
-            }
-        }
-
-        @media (max-width: 1516px) {
-            .top-nav {
-                display: none;
+            .control-pill {
+                right: 12px;
+                top: 10px;
+                padding: 8px 10px;
+                font-size: 0.95rem;
             }
 
-            .hero h1 {
-                font-size: 1.8rem;
-            }
-
-            .logo-text {
-                font-size: 14px;
-            }
-
-            .main-navbar {
-                padding: 12px 15px;
-                margin: 0 10px;
-                width: calc(100% - 20px);
+            .action-button {
+                min-width: 110px;
+                font-size: 1rem;
+                padding: 8px 14px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid p-0">
-        <div id="mobile-res" class="top-nav">
-            <a href="#" class="text-decoration-none">Online banking</a>
-            <a href="#" class="text-decoration-none">Private banking online</a>
-            <a href="#" class="text-decoration-none">Straight2Bank</a>
-            <a href="#" class="text-decoration-none">Local sites</a>
-            <a href="#" class="text-decoration-none">Contact us</a>
-        </div>
 
-        <nav class="main-navbar">
-            <div class="logo-container">
-                <img class="img-fluid" width="150" height="100" src="../Standard-Chartered-Logo.png" alt="Logo">
-            </div>
+    <div class="container">
+        <div class="row g-4 justify-content-start">
+            <div class="col-12 col-md-6">
+                <div class="feedback-form-box">
+                    <form id="feedbackForm" novalidate>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-auto pe-0">
+                                <div class="info-label">Name</div>
+                            </div>
+                            <div class="col">
+                                <input id="user-name-input" class="text-input-field w-100" type="text"
+                                    placeholder="Your Name" required>
+                            </div>
+                        </div>
 
-            <div class="nav-links">
-                <a class="nav-link" href="#">About us</a>
-                <a class="nav-link" href="#">Corporate & Investment</a>
-                <a class="nav-link" href="#">Wealth & Retail</a>
-                <a class="nav-link" href="#">Ventures</a>
-                <a class="nav-link" href="#">Investors</a>
-                <a class="nav-link" href="#">Insights</a>
-                <a class="nav-link" href="#">Media</a>
-                <a class="nav-link" href="#">Careers</a>
-                <i class="fas fa-search search-icon"></i>
-            </div>
+                        <div class="row align-items-start mb-3">
+                            <div class="col-auto pe-0">
+                                <div class="info-label"
+                                    style="padding-top:10px;padding-bottom:10px; min-height:72px;">
+                                    Message
+                                </div>
+                            </div>
+                            <div class="col">
+                                <textarea id="user-msg-input" class="text-input-field w-100" rows="4"
+                                    placeholder="Enter your Message" required></textarea>
+                            </div>
+                        </div>
 
-            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
-        </nav>
-
-        <div class="mobile-nav" id="mobileNav">
-            <div class="mobile-nav-header">
-                <div class="d-flex align-items-center">
-                    <img class="img-fluid" width="145" height="110" src="../Standard-Chartered-Logo.png" alt="Logo">
-                </div>
-                <button class="mobile-close" onclick="toggleMobileMenu()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div class="mobile-nav-links">
-                <a href="#" class="text-decoration-none">Online banking</a>
-                <a href="#" class="text-decoration-none">Private banking online</a>
-                <a href="#" class="text-decoration-none">Straight2Bank</a>
-                <a href="#" class="text-decoration-none">Local sites</a>
-                <a href="#" class="text-decoration-none">Contact us</a>
-                <a href="#" class="text-decoration-none">About us</a>
-                <a href="#" class="text-decoration-none">Corporate & Investment</a>
-                <a href="#" class="text-decoration-none">Wealth & Retail</a>
-                <a href="#" class="text-decoration-none">Ventures</a>
-                <a href="#" class="text-decoration-none">Investors</a>
-                <a href="#" class="text-decoration-none">Insights</a>
-                <a href="#" class="text-decoration-none">Media</a>
-                <a href="#" class="text-decoration-none">Careers</a>
-                <div class="mt-3">
-                    <i class="fas fa-search" style="color: #333; font-size: 18px;"></i>
+                        <button type="submit" id="submit-action-btn" class="action-button">Submit</button>
+                        <input type="hidden" id="item-to-edit-id" value="">
+                    </form>
                 </div>
             </div>
-        </div>
 
-        <section class="hero">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="hero-content text-center">
-                            <h1 class="display-4 mb-4">
-                                <span class="blue"></span> From here, possibilities are everywhere <span
-                                    class="green"></span>
-                            </h1>
-                            <p class="lead mb-4">
-                                We're here to connect your potential to possibilities in the world's most <br> dynamic
-                                markets.
-                            </p>
-                            <a href="#" class="btn btn-learn">Learn how <span>></span></a>
+            <div class="col-12">
+                <div class="feedback-display-area">
+                    <h3>Testimonials</h3>
+                    <div id="feedback-list-container">
+                        <div class="feedback-card" data-id="sample-1">
+                            <div class="control-pill" data-action="edit">Edit | <small>Delete</small></div>
+                            <div class="user-name">Ritu</div>
+                            <div class="user-message">It has been a positive experience with personable banking service in a
+                                timely manner</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="green-circle"></div>
-        </section>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function toggleMobileMenu() {
-            const mobileNav = document.getElementById('mobileNav');
-            mobileNav.classList.toggle('active');
-        }
+        (function () {
+            const formElement = document.getElementById('feedbackForm');
+            const nameField = document.getElementById('user-name-input');
+            const messageField = document.getElementById('user-msg-input');
+            const displayList = document.getElementById('feedback-list-container');
+            const editIdHiddenField = document.getElementById('item-to-edit-id');
+            const actionButton = document.getElementById('submit-action-btn');
 
-        document.addEventListener('click', function (e) {
-            const mobileNav = document.getElementById('mobileNav');
-            const menuBtn = document.querySelector('.mobile-menu-btn');
-
-            if (!mobileNav.contains(e.target) && !menuBtn.contains(e.target)) {
-                mobileNav.classList.remove('active');
+            // --- Storage helpers ---
+            function loadItemsFromStorage() {
+                // Key name changed from "testimonials" to "feedbackItems"
+                return JSON.parse(localStorage.getItem("feedbackItems") || "[]");
             }
-        });
+            function saveItemsToStorage(dataArray) {
+                // Key name changed from "testimonials" to "feedbackItems"
+                localStorage.setItem("feedbackItems", JSON.stringify(dataArray));
+            }
+
+            // utility to generate simple IDs
+            function generateUniqueId() { return 'fid-' + Math.random().toString(36).slice(2, 9); } // Prefix changed
+
+            // Render feedback card HTML element
+            function createFeedbackElement(itemId, itemName, itemMsg) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'feedback-card'; // Class name changed
+                wrapper.dataset.id = itemId;
+
+                const control = document.createElement('div');
+                control.className = 'control-pill'; // Class name changed
+                control.innerHTML = 'Edit | <small>Delete</small>';
+                control.addEventListener('click', handleControlPillClick); // Function name changed
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'user-name'; // Class name changed
+                nameDiv.textContent = itemName;
+
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'user-message'; // Class name changed
+                msgDiv.textContent = itemMsg;
+
+                wrapper.appendChild(control);
+                wrapper.appendChild(nameDiv);
+                wrapper.appendChild(msgDiv);
+                return wrapper;
+            }
+
+            // Render all feedback items
+            function refreshFeedbackDisplay() { // Function name changed
+                displayList.innerHTML = "";
+                const items = loadItemsFromStorage();
+                items.forEach(item => {
+                    const elem = createFeedbackElement(item.id, item.name, item.msg);
+                    displayList.appendChild(elem);
+                });
+            }
+
+            // Handle form submission
+            formElement.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const name = nameField.value.trim();
+                const msg = messageField.value.trim();
+                if (!name || !msg) {
+                    alert('Enter both name and message !');
+                    return;
+                }
+
+                const items = loadItemsFromStorage();
+                const editingId = editIdHiddenField.value;
+
+                if (editingId) {
+                    // update existing item
+                    const index = items.findIndex(item => item.id === editingId);
+                    if (index > -1) {
+                        items[index].name = name;
+                        items[index].msg = msg;
+                    }
+                    saveItemsToStorage(items);
+                    editIdHiddenField.value = "";
+                    actionButton.textContent = "Submit";
+                } else {
+                    // create new item
+                    const id = generateUniqueId();
+                    items.push({ id, name, msg });
+                    saveItemsToStorage(items);
+                }
+
+                refreshFeedbackDisplay();
+                formElement.reset();
+            });
+
+            // handle edit/delete control pill click
+            function handleControlPillClick(e) { // Function name changed
+                const cardElement = e.currentTarget.closest('.feedback-card');
+                const id = cardElement.dataset.id;
+
+                const choice = confirm('Edit or Delete ? OK for Edit, Cancel for Delete');
+                if (choice) {
+                    // edit flow
+                    const items = loadItemsFromStorage();
+                    const item = items.find(i => i.id === id);
+                    if (item) {
+                        nameField.value = item.name;
+                        messageField.value = item.msg;
+                        editIdHiddenField.value = id;
+                        actionButton.textContent = 'Update';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                } else {
+                    // delete flow
+                  
+                        let items = loadItemsFromStorage().filter(i => i.id !== id);
+                        saveItemsToStorage(items);
+                        refreshFeedbackDisplay();
+                    
+                }
+            }
+
+            // --- On page load ---
+            refreshFeedbackDisplay();
+        })();
     </script>
+
+
 </body>
 
 </html>
