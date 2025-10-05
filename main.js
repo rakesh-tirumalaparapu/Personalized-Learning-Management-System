@@ -32,251 +32,324 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-new task 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checker Portal Wireframe (Low-Fidelity Sketch)</title>
+    <style>
+        /* --- Figma-Style Wireframe Styling (Solid Borders, Data Added) --- */
+        body {
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+            background-color: #fcfcfc;
+            color: #333;
+        }
 
+        /* Define a subtle accent color */
+        :root {
+            --accent-color: #c7e0ff; /* Very Light Blue for subtle emphasis */
+            --dark-accent: #3470a8;  /* Dark Blue for Navbar */
+            --border-color: #999;    /* Medium gray for clean lines */
+        }
 
-[
-  { "id": 1, "firstName": "Sundar", "lastName": "Pichai", "email": "sundar.pichai@google.com" },
-  { "id": 2, "firstName": "Satya", "lastName": "Nadella", "email": "satya.nadella@microsoft.com" },
-  { "id": 3, "firstName": "Jeff", "lastName": "Bezos", "email": "jeff.bezos@amazon.com" },
-  { "id": 4, "firstName": "Sergey", "lastName": "Brin", "email": "sergey.brin@google.com" },
-  { "id": 5, "firstName": "Larry", "lastName": "Page", "email": "larry.page@google.com" }
-]
+        /* Utility classes for spacing and layout */
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 25px 0;
+        }
 
-
-
-import { useState } from "react";
-// Assuming customers.json is in the correct path relative to components
-import initialCustomers from "../assets/customers.json"; 
-import CustomerDetails from "./CustomerDetails";
-import CustomerForm from "./CustomerForm";
-
-function CustomerList() {
-    // FIX 1: Use initialCustomers data for the list
-    const [customers, setCustomers] = useState(initialCustomers);
-    
-    // FIX 2: Add a separate state for the currently selected customer
-    const [selectedCustomer, setSelectedCustomer] = useState({});
-
-    // Handler to update the selectedCustomer state when a table row is clicked
-    const onCustomerSelect = (e, customer) => {
-        e.preventDefault();
-        // FIX 3: Use the setter for the selected customer
-        setSelectedCustomer(customer); 
-    };
-
-    // Handler to add a new customer to the list
-    const addCustomer = (newCustomer) => {
-        // Create a new customer object with a unique ID
-        const newId = customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1;
-        const customerWithId = { ...newCustomer, id: newId };
+        /* Common block styling - Solid borders are now used */
+        .block {
+            border: 1px solid var(--border-color); /* Solid line effect */
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-shadow: 2px 2px 0 0 #ccc; /* Simple, blocky shadow retained */
+        }
         
-        // FIX 4: Correctly update the list state by appending the new customer
-        setCustomers([...customers, customerWithId]);
+        /* 1. Navbar Block */
+        .navbar-block {
+            background-color: var(--dark-accent);
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            color: white;
+            font-weight: bold;
+            border: none;
+        }
+
+        .nav-links div:hover {
+            text-decoration: underline;
+            cursor: pointer;
+            color: var(--accent-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-size: 0.95em;
+        }
+
+        .nav-user {
+            width: 180px;
+            height: 30px;
+            background-color: #5d8ab5;
+            text-align: center;
+            line-height: 30px;
+            font-size: 0.85em;
+            color: white;
+        }
+
+        /* 2. Banner/Title Block */
+        .banner-block {
+            background-color: var(--accent-color); /* Light Blue Banner */
+            height: 40px;
+            line-height: 40px;
+            padding: 0 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: 1px solid var(--dark-accent);
+        }
+
+        /* 3. KPI / Metrics Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin: 25px 0;
+        }
         
-        // Optionally select the newly added customer
-        setSelectedCustomer(customerWithId);
-    };
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
-    // --- Rendering Logic for the Table Rows ---
-    // tabRows now uses the 'customers' list state
-    const tabRows = customers.map((customer) => {
-        return (
-            <tr 
-                key={customer.id} 
-                onClick={(e) => onCustomerSelect(e, customer)}
-                // Optional: Highlight the selected row
-                className={selectedCustomer.id === customer.id ? "table-active" : ""}
-                style={{ cursor: 'pointer' }}
-            >
-                <td>{customer.id}</td>
-                <td>{customer.firstName}</td>
-                <td>{customer.lastName}</td>
-                <td>{customer.email}</td>
-            </tr>
-        );
-    });
+        .kpi-block {
+            padding: 15px;
+            height: 90px;
+            background-color: #f7faff;
+        }
 
-    return (
-        // Added 'container' for margins as seen in UI
-        <div className="container mt-4"> 
+        .kpi-label {
+            height: 15px;
+            width: 100%;
+            background-color: transparent;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--dark-accent);
+            font-size: 0.9em;
+        }
+
+        .kpi-value {
+            height: 30px;
+            width: 40%;
+            background-color: #eee; /* Placeholder Gray for data value */
+            /* Removed cross-hatch, using solid fill for cleaner look */
+            border: 1px solid var(--border-color);
+            margin-top: 5px;
+        }
+
+        /* 4. Main Table/Queue Block */
+        .table-container {
+            padding: 15px;
+            min-height: 400px;
+        }
+
+        .table-title-block {
+            height: 25px;
+            width: 300px;
+            background-color: #eee;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            line-height: 25px;
+            padding-left: 5px;
+        }
+        
+        /* Table Structure */
+        .table-row {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0; /* Solid, light separator */
+            font-size: 0.9em;
+        }
+        
+        .table-header-row {
+            background-color: #eef2ff; /* Subtle blue background for header */
+            font-weight: bold;
+            padding: 10px 0;
+            border-bottom: 2px solid var(--dark-accent);
+            color: var(--dark-accent);
+        }
+
+        /* Placeholder styles for data cells */
+        .data-placeholder { 
+            height: 15px; 
+            margin-right: 15px;
+            line-height: 15px;
+        }
+
+        .table-col-id { width: 10%; }
+        .table-col-customer { width: 20%; }
+        .table-col-type { width: 10%; }
+        .table-col-amount { width: 15%; }
+        .table-col-comment { width: 25%; }
+        .table-col-actions { width: 15%; display: flex; gap: 10px; }
+        
+        /* Action buttons in wireframe */
+        .action-button-placeholder {
+            width: 48%;
+            height: 25px;
+            background-color: #5cb85c; /* Placeholder Green for Approve */
+            line-height: 25px;
+            text-align: center;
+            font-size: 0.8em;
+            color: white;
+            border: 1px solid #333;
+        }
+        /* Override for Reject to differentiate */
+        .action-button-placeholder:nth-child(2) {
+             background-color: #d9534f; /* Placeholder Red for Reject */
+        }
+
+
+        .pagination-block {
+            height: 30px;
+            width: 250px;
+            background-color: #eee;
+            margin-top: 20px;
+            float: right;
+            border: 1px solid var(--border-color);
+            line-height: 30px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        
+        /* Mobile Visibility for Table */
+        @media (max-width: 768px) {
+            .table-col-comment {
+                display: none;
+            }
+            .table-col-id { width: 15%; }
+            .table-col-customer { width: 30%; }
+            .table-col-type { width: 15%; }
+            .table-col-amount { width: 20%; }
+            .table-col-actions { width: 20%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Navbar Block -->
+    <div class="navbar-block">
+        <div>LOS CHECKER</div>
+        <div class="nav-links">
+            <div>Verified Applications</div>
+            <div>Approved</div>
+            <div>Rejected</div>
+            <div style="position: relative;">Notifications <span style="position: absolute; top: -5px; right: -10px; width: 12px; height: 12px; background-color: red; border-radius: 50%;"></span></div>
+        </div>
+        <div class="nav-user">User Dropdown Menu</div>
+    </div>
+
+    <div class="container">
+        
+        <!-- 2. Banner Block -->
+        <div class="banner-block">
+            VERIFIED LOAN PROCESSING CENTER
+        </div>
+
+        <!-- Section Title -->
+        <div style="margin-top: 25px; margin-bottom: 10px; font-size: 1.2em; font-weight: bold;">Final Review Queue</div>
+
+        <!-- 3. KPI / Metrics Grid -->
+        <div class="kpi-grid">
+            <div class="kpi-block block">
+                <div class="kpi-label">TOTAL IN QUEUE</div>
+                <div class="kpi-value"></div>
+            </div>
+            <div class="kpi-block block">
+                <div class="kpi-label">APPROVALS TODAY</div>
+                <div class="kpi-value"></div>
+            </div>
+            <div class="kpi-block block">
+                <div class="kpi-label">SLA RISK</div>
+                <div class="kpi-value"></div>
+            </div>
+        </div>
+
+        <!-- 4. Main Table/Queue Block -->
+        <div class="table-container block">
+            <div class="table-title-block">Applications Pending Final Review</div>
             
-            {/* Customer List Table */}
-            <div className="row">
-                <div className="col-12">
-                    <h1>Customers List</h1>
-                    {/* Your table code block */}
-                    <table className="table table-hover table-bordered table-sm">
-                        <thead className="thead-light">
-                            <tr>
-                                <th>Id</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Email</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {tabRows}
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Table Headers -->
+            <div class="table-row table-header-row">
+                <div class="table-col-id data-placeholder">Loan ID</div>
+                <div class="table-col-customer data-placeholder">Customer</div>
+                <div class="table-col-type data-placeholder">Type</div>
+                <div class="table-col-amount data-placeholder">Amount</div>
+                <div class="table-col-comment data-placeholder" style="display: block;">Maker Comment</div>
+                <div class="table-col-actions data-placeholder">Actions</div>
             </div>
 
-            {/* Layout for Form and Details (Two Columns) */}
-            <div className="row mt-4">
-                
-                {/* Left side: Add Customer Form */}
-                <div className="col-md-6">
-                    <h2>Add Customer</h2>
-                    <CustomerForm addCustomer={addCustomer} />
-                </div>
-                
-                {/* Right side: Customer Details */}
-                <div className="col-md-6">
-                    <h2>Customer Details</h2>
-                    {/* FIX 5: Pass the selectedCustomer state */}
-                    <CustomerDetails customer={selectedCustomer} />
+            <!-- Table Rows (Real Data) -->
+            <div class="table-row">
+                <div class="table-col-id data-placeholder">LNS-9012</div>
+                <div class="table-col-customer data-placeholder">Rhea Sharma</div>
+                <div class="table-col-type data-placeholder">Home</div>
+                <div class="table-col-amount data-placeholder">45,00,000</div>
+                <div class="table-col-comment data-placeholder">All documents verified; clear CIBIL.</div>
+                <div class="table-col-actions">
+                    <div class="action-button-placeholder">Approve</div>
+                    <div class="action-button-placeholder">Reject</div>
                 </div>
             </div>
-        </div>
-    );
-}
-
-export default CustomerList;
-
-
-
-
-
-import { useState } from 'react';
-
-function CustomerForm(props) {
-    // State for the form inputs
-    const [customer, setCustomer] = useState({
-        firstName: "",
-        lastName: "",
-        email: ""
-    });
-
-    // Function to reset the form state
-    const resetForm = () => {
-        setCustomer({
-            firstName: "",
-            lastName: "",
-            email: ""
-        });
-    };
-
-    // Updates state whenever an input field changes
-    const handleInputChange = (e) => {
-        setCustomer({
-            ...customer,
-            // Uses the input's 'name' attribute to set the corresponding state key
-            [e.target.name]: e.target.value 
-        });
-    };
-
-    // Handles form submission
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-        
-        // 1. Call the addCustomer function passed from CustomerList
-        props.addCustomer(customer); 
-
-        // 2. Clear the form after adding the customer (FIX)
-        resetForm();
-    };
-
-    return (
-        <div>
-            <h1>Customer Form</h1>
-            <form onSubmit={handleFormSubmit}> 
-                
-                {/* First Name Input */}
-                <div className="form-group mb-3">
-                    <label htmlFor="firstName">First Name</label>
-                    <input 
-                        type="text" 
-                        id="firstName"
-                        name="firstName" 
-                        value={customer.firstName}
-                        onChange={handleInputChange} 
-                        className="form-control"
-                    />
+             <div class="table-row">
+                <div class="table-col-id data-placeholder">LNS-8955</div>
+                <div class="table-col-customer data-placeholder">Arjun Singh</div>
+                <div class="table-col-type data-placeholder">Vehicle</div>
+                <div class="table-col-amount data-placeholder">8,50,000</div>
+                <div class="table-col-comment data-placeholder">Income proof strong; minor address discrepancy.</div>
+                <div class="table-col-actions">
+                    <div class="action-button-placeholder">Approve</div>
+                    <div class="action-button-placeholder">Reject</div>
                 </div>
-
-                {/* Last Name Input */}
-                <div className="form-group mb-3">
-                    <label htmlFor="lastName">Last Name</label>
-                    <input 
-                        type="text" 
-                        id="lastName"
-                        name="lastName" 
-                        value={customer.lastName}
-                        onChange={handleInputChange} 
-                        className="form-control"
-                    />
-                </div>
-
-                {/* Email Input */}
-                <div className="form-group mb-3">
-                    <label htmlFor="email">Email</label>
-                    <input 
-                        type="email" 
-                        id="email"
-                        name="email" 
-                        value={customer.email}
-                        onChange={handleInputChange} 
-                        className="form-control"
-                    />
-                </div>
-                
-                <button type="submit" className="btn btn-primary">
-                    Submit
-                </button>
-            </form>
-        </div>
-    );
-}
-
-export default CustomerForm;
-
-
-
-function CustomerDetails(props) {
-    const customer = props.customer;
-
-    // Check if the customer object is empty
-    if (!customer || Object.keys(customer).length === 0) {
-        return (
-            <div className="p-3 text-muted">
-                <p>Click a row in the Customer List to view details.</p>
             </div>
-        );
-    }
-    
-    return (
-        <div className="p-3">
-            <h1>Customer Details</h1>
-            <p>ID : {props.customer.id}</p>
-            {/* FIX 1: Corrected mappings */}
-            <p>First Name : {props.customer.firstName}</p>
-            <p>Last Name : {props.customer.lastName}</p>
-            <p>Email: {props.customer.email}</p>
-            {/* Removed "Phone" as it's not in the data structure */}
-        </div>
-    );
-}
-
-export default CustomerDetails;
-
-
-<link 
-  rel="stylesheet" 
-  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
-  integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
-  crossorigin="anonymous"
->
-
+             <div class="table-row">
+                <div class="table-col-id data-placeholder">LNS-8941</div>
+                <div class="table-col-customer data-placeholder">Priya Kulkarni</div>
+                <div class="table-col-type data-placeholder">Personal</div>
+                <div class="table-col-amount data-placeholder">2,00,000</div>
+                <div class="table-col-comment data-placeholder">Self-employed ITR for 2 years attached.</div>
+                <div class="table-col-actions">
+                    <div class="action-button-placeholder">Approve</div>
+                    <div class="action-button-placeholder">Reject</div>
+                </div>
+            </div>
+             <div class="table-row">
+                <div class="table-col-id data-placeholder">LNS-8890</div>
+                <div class="table-col-customer data-placeholder">Karan Verma</div>
+                <div class="table-col-type data-placeholder">Home</div>
+                <div class="table-col-amount data-placeholder">95,00,000</div>
+                <div class="table-col-comment data-placeholder">High amount, re-verified property papers.</div>
+                <div class="table-col-actions">
+                    <div class="action-button-placeholder">Approve</div>
+                    <div class="action-button-placeholder">Reject</div>
+                </div>
+            </div>
             
+            <div class="pagination-block">Pagination / Page Size Control</div>
+        </div>
+
+    </div>
+
+</body>
+</html>
 
