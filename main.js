@@ -37,22 +37,27 @@ document.addEventListener('DOMContentLoaded', function () {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checker Portal Wireframe (Low-Fidelity Sketch)</title>
+    <title>Checker Portal Wireframe - Standard Chartered Balanced Color Style</title>
     <style>
-        /* --- Figma-Style Wireframe Styling (Solid Borders, Data Added) --- */
+        /* --- Standard Chartered-Inspired Wireframe Styling (Balanced Blue & Green) --- */
         body {
             font-family: monospace;
             margin: 0;
             padding: 0;
-            background-color: #fcfcfc;
+            background-color: #f7f7f7; /* Off-White Canvas */
             color: #333;
         }
 
-        /* Define a subtle accent color */
+        /* Standard Chartered Palette (Blue and Vibrant Green) */
         :root {
-            --accent-color: #c7e0ff; /* Very Light Blue for subtle emphasis */
-            --dark-accent: #3470a8;  /* Dark Blue for Navbar */
-            --border-color: #999;    /* Medium gray for clean lines */
+            --sc-blue: #006AA7; /* Primary Dark Blue (Structural) */
+            --sc-green: #38C172; /* **Vibrant Green (Secondary Structure/Action)** */
+            --sc-text-dark: #333;
+            --sc-text-light: #fff;
+            --border-color: #ccc; /* Lighter border for clean look */
+            --subtle-gray: #e0e0e0; /* Used for neutral blocks */
+            --light-blue: #eef2ff;
+            --light-green: #e9fff0;
         }
 
         /* Utility classes for spacing and layout */
@@ -63,59 +68,100 @@ document.addEventListener('DOMContentLoaded', function () {
             padding: 25px 0;
         }
 
-        /* Common block styling - Solid borders are now used */
+        /* Common block styling - Solid borders */
         .block {
-            border: 1px solid var(--border-color); /* Solid line effect */
+            border: 1px solid var(--border-color); 
             background-color: #fff;
             padding: 10px;
             margin-bottom: 15px;
-            box-shadow: 2px 2px 0 0 #ccc; /* Simple, blocky shadow retained */
+            box-shadow: 1px 1px 0 0 #ddd; /* Softer shadow */
         }
         
-        /* 1. Navbar Block */
+        /* 1. Navbar Block (Primary SC Blue) */
         .navbar-block {
-            background-color: var(--dark-accent);
+            background-color: var(--sc-blue);
             height: 50px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 25px;
-            color: white;
+            color: var(--sc-text-light);
             font-weight: bold;
             border: none;
         }
 
+        .nav-links div {
+            padding: 5px 10px;
+            transition: background-color 0.2s;
+        }
+
         .nav-links div:hover {
-            text-decoration: underline;
+            background-color: #008cdb; /* Lighter blue hover */
             cursor: pointer;
-            color: var(--accent-color);
+            color: #f7f7f7; 
         }
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 20px;
             font-size: 0.95em;
         }
 
+        /* Styling for the new User Dropdown Structure */
         .nav-user {
-            width: 180px;
+            position: relative;
             height: 30px;
-            background-color: #5d8ab5;
-            text-align: center;
             line-height: 30px;
             font-size: 0.85em;
-            color: white;
+            color: var(--sc-text-dark);
+            cursor: pointer;
+            /* Centering the text horizontally and vertically */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            padding-right: 20px; /* Space for the arrow */
+            padding-left: 10px;
+            
+            background-color: var(--subtle-gray);
+            border: 1px solid var(--border-color);
+            width: 180px; 
+            box-sizing: border-box; /* Include padding/border in width */
+        }
+        .nav-user::after {
+            content: '▼'; /* Placeholder for dropdown arrow */
+            position: absolute;
+            right: 5px;
+            font-size: 0.6em;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .user-dropdown {
+            position: absolute;
+            top: 30px; 
+            right: 0;
+            width: 180px;
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            z-index: 10;
+            display: none; /* Hide in wireframe, conceptually a dropdown */
+        }
+        .user-dropdown div {
+            padding: 8px 10px;
+            color: var(--sc-text-dark);
+            border-bottom: 1px solid #eee;
         }
 
-        /* 2. Banner/Title Block */
+        /* 2. Banner/Title Block (SC Green for balanced branding) */
         .banner-block {
-            background-color: var(--accent-color); /* Light Blue Banner */
+            background-color: var(--sc-green); /* Use VIBRANT Green for the main banner */
+            color: var(--sc-text-light); /* White text on Green background */
             height: 40px;
             line-height: 40px;
             padding: 0 20px;
             font-size: 1.1em;
             font-weight: 600;
-            border: 1px solid var(--dark-accent);
+            border: 1px solid var(--sc-green);
         }
 
         /* 3. KPI / Metrics Grid */
@@ -135,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .kpi-block {
             padding: 15px;
             height: 90px;
-            background-color: #f7faff;
+            background-color: #fff; 
         }
 
         .kpi-label {
@@ -144,17 +190,24 @@ document.addEventListener('DOMContentLoaded', function () {
             background-color: transparent;
             margin-bottom: 8px;
             border-bottom: 1px solid var(--border-color);
-            color: var(--dark-accent);
+            color: var(--sc-text-dark); 
             font-size: 0.9em;
         }
 
+        /* Use Blue and Green alternately for KPI values */
         .kpi-value {
             height: 30px;
             width: 40%;
-            background-color: #eee; /* Placeholder Gray for data value */
-            /* Removed cross-hatch, using solid fill for cleaner look */
+            background-color: var(--sc-blue); /* Default KPI value is Blue */
             border: 1px solid var(--border-color);
             margin-top: 5px;
+        }
+        
+        .kpi-block:nth-child(2) .kpi-value {
+            background-color: var(--sc-green); /* Second KPI value is Vibrant Green */
+        }
+        .kpi-block:nth-child(3) .kpi-value {
+            background-color: var(--sc-blue); /* Third KPI value is Blue */
         }
 
         /* 4. Main Table/Queue Block */
@@ -166,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .table-title-block {
             height: 25px;
             width: 300px;
-            background-color: #eee;
+            background-color: #e0e0e0;
             margin-bottom: 15px;
             border: 1px solid var(--border-color);
             line-height: 25px;
@@ -177,16 +230,17 @@ document.addEventListener('DOMContentLoaded', function () {
         .table-row {
             display: flex;
             padding: 8px 0;
-            border-bottom: 1px solid #e0e0e0; /* Solid, light separator */
+            border-bottom: 1px solid #e0e0e0; 
             font-size: 0.9em;
         }
         
         .table-header-row {
-            background-color: #eef2ff; /* Subtle blue background for header */
+            /* Alternating subtle blue and green for the header background */
+            background: linear-gradient(90deg, var(--light-blue) 50%, var(--light-green) 100%);
             font-weight: bold;
             padding: 10px 0;
-            border-bottom: 2px solid var(--dark-accent);
-            color: var(--dark-accent);
+            border-bottom: 2px solid var(--sc-blue); 
+            color: var(--sc-text-dark); /* Dark text for readability */
         }
 
         /* Placeholder styles for data cells */
@@ -207,23 +261,23 @@ document.addEventListener('DOMContentLoaded', function () {
         .action-button-placeholder {
             width: 48%;
             height: 25px;
-            background-color: #5cb85c; /* Placeholder Green for Approve */
+            background-color: var(--sc-green); /* VIBRANT Green for Approve */
             line-height: 25px;
             text-align: center;
             font-size: 0.8em;
             color: white;
-            border: 1px solid #333;
+            border: 1px solid var(--sc-text-dark);
         }
-        /* Override for Reject to differentiate */
+        /* Override for Reject (Standard professional Red) */
         .action-button-placeholder:nth-child(2) {
-             background-color: #d9534f; /* Placeholder Red for Reject */
+             background-color: #d9534f; 
         }
 
 
         .pagination-block {
             height: 30px;
             width: 250px;
-            background-color: #eee;
+            background-color: #e0e0e0;
             margin-top: 20px;
             float: right;
             border: 1px solid var(--border-color);
@@ -247,27 +301,37 @@ document.addEventListener('DOMContentLoaded', function () {
 </head>
 <body>
 
-    <!-- 1. Navbar Block -->
+    <!-- 1. Navbar Block (SC Blue - Structural) -->
     <div class="navbar-block">
-        <div>LOS CHECKER</div>
+        <div>SC BANK - LOS CHECKER</div>
         <div class="nav-links">
             <div>Verified Applications</div>
             <div>Approved</div>
             <div>Rejected</div>
             <div style="position: relative;">Notifications <span style="position: absolute; top: -5px; right: -10px; width: 12px; height: 12px; background-color: red; border-radius: 50%;"></span></div>
         </div>
-        <div class="nav-user">User Dropdown Menu</div>
+        
+        <!-- User Dropdown Menu -->
+        <div class="nav-user">
+            User Dropdown Menu
+            <div class="user-dropdown">
+                <div>My Profile</div>
+                <div>Change Password</div>
+                <div>Settings</div>
+                <div style="color: #d9534f; font-weight: bold;">Logout</div>
+            </div>
+        </div>
     </div>
 
     <div class="container">
         
-        <!-- 2. Banner Block -->
+        <!-- 2. Banner Block (SC Green - Balanced Branding) -->
         <div class="banner-block">
             VERIFIED LOAN PROCESSING CENTER
         </div>
 
         <!-- Section Title -->
-        <div style="margin-top: 25px; margin-bottom: 10px; font-size: 1.2em; font-weight: bold;">Final Review Queue</div>
+        <div style="margin-top: 25px; margin-bottom: 10px; font-size: 1.2em; font-weight: bold; color: var(--sc-blue);">Final Review Queue</div>
 
         <!-- 3. KPI / Metrics Grid -->
         <div class="kpi-grid">
@@ -287,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         <!-- 4. Main Table/Queue Block -->
         <div class="table-container block">
-            <div class="table-title-block">Applications Pending Final Review</div>
+            <div class="table-title-block">Current Workflow Items</div>
             
             <!-- Table Headers -->
             <div class="table-row table-header-row">
@@ -352,4 +416,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </body>
 </html>
+
+
 
