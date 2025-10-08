@@ -28,394 +28,252 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.InputMismatchException;
+
+// --- Customer Class ---
+class Customer {
+    private static int nextCustomerId = 1000; // Starting ID for auto-generation
+
+    private int customerId;
+    private String name;
+    private String contact;
+    private String mailId;
+    private String accountType; // Savings or Current
+
+    // Constructor to create a new customer with auto-generated ID
+    public Customer(String name, String contact, String mailId, String accountType) {
+        this.customerId = nextCustomerId++;
+        this.name = name;
+        this.contact = contact;
+        this.mailId = mailId;
+        this.accountType = accountType;
+    }
+
+    // Getters for display
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public String getMailId() {
+        return mailId;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    // toString method for easy display of customer details
+    @Override
+    public String toString() {
+        return String.format(
+            "Customer ID = %d, Customer name = %s, Customer email = %s, Customer contact = %s, Account Type = %s",
+            customerId, name, mailId, contact, accountType
+        );
+    }
+}
 
 
+// --- BankCustomerManagementSystem Class ---
+public class BankCustomerManagementSystem {
 
+    private static List<Customer> customerList = new ArrayList<>();
+    private static Scanner scanner = new Scanner(System.in);
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checker Portal Wireframe - Standard Chartered Balanced Color Style</title>
-    <style>
-        /* --- Standard Chartered-Inspired Wireframe Styling (Balanced Blue & Green) --- */
-        body {
-            font-family: monospace;
-            margin: 0;
-            padding: 0;
-            background-color: #f7f7f7; /* Off-White Canvas */
-            color: #333;
-        }
-
-        /* Standard Chartered Palette (Blue and Vibrant Green) */
-        :root {
-            --sc-blue: #006AA7; /* Primary Dark Blue (Structural) */
-            --sc-green: #38C172; /* **Vibrant Green (Secondary Structure/Action)** */
-            --sc-text-dark: #333;
-            --sc-text-light: #fff;
-            --border-color: #ccc; /* Lighter border for clean look */
-            --subtle-gray: #e0e0e0; /* Used for neutral blocks */
-            --light-blue: #eef2ff;
-            --light-green: #e9fff0;
-        }
-
-        /* Utility classes for spacing and layout */
-        .container {
-            width: 95%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 25px 0;
-        }
-
-        /* Common block styling - Solid borders */
-        .block {
-            border: 1px solid var(--border-color); 
-            background-color: #fff;
-            padding: 10px;
-            margin-bottom: 15px;
-            box-shadow: 1px 1px 0 0 #ddd; /* Softer shadow */
-        }
+    // --- Main application logic ---
+    public static void main(String[] args) {
+        // Pre-populate with some data as shown in the image for testing
+        customerList.add(new Customer("Sandra", "7788990011", "Sandra@gmail.com", "Savings"));
+        customerList.add(new Customer("Michelle", "9988776655", "Michelle@gmail.com", "Current"));
+        customerList.add(new Customer("Steve", "5544332211", "Steve@gmail.com", "Savings"));
         
-        /* 1. Navbar Block (Primary SC Blue) */
-        .navbar-block {
-            background-color: var(--sc-blue);
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 25px;
-            color: var(--sc-text-light);
-            font-weight: bold;
-            border: none;
-        }
+        int choice;
 
-        .nav-links div {
-            padding: 5px 10px;
-            transition: background-color 0.2s;
-        }
+        do {
+            displayMenu();
+            try {
+                System.out.print("Please enter your choice: ");
+                choice = scanner.nextInt();
+                scanner.nextLine(); // Consume newline left over after nextInt()
 
-        .nav-links div:hover {
-            background-color: #008cdb; /* Lighter blue hover */
-            cursor: pointer;
-            color: #f7f7f7; 
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 20px;
-            font-size: 0.95em;
-        }
-
-        /* Styling for the new User Dropdown Structure */
-        .nav-user {
-            position: relative;
-            height: 30px;
-            line-height: 30px;
-            font-size: 0.85em;
-            color: var(--sc-text-dark);
-            cursor: pointer;
-            /* Centering the text horizontally and vertically */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            
-            padding-right: 20px; /* Space for the arrow */
-            padding-left: 10px;
-            
-            background-color: var(--subtle-gray);
-            border: 1px solid var(--border-color);
-            width: 180px; 
-            box-sizing: border-box; /* Include padding/border in width */
-        }
-        .nav-user::after {
-            content: '▼'; /* Placeholder for dropdown arrow */
-            position: absolute;
-            right: 5px;
-            font-size: 0.6em;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        .user-dropdown {
-            position: absolute;
-            top: 30px; 
-            right: 0;
-            width: 180px;
-            background-color: #fff;
-            border: 1px solid var(--border-color);
-            z-index: 10;
-            display: none; /* Hide in wireframe, conceptually a dropdown */
-        }
-        .user-dropdown div {
-            padding: 8px 10px;
-            color: var(--sc-text-dark);
-            border-bottom: 1px solid #eee;
-        }
-
-        /* 2. Banner/Title Block (SC Green for balanced branding) */
-        .banner-block {
-            background-color: var(--sc-green); /* Use VIBRANT Green for the main banner */
-            color: var(--sc-text-light); /* White text on Green background */
-            height: 40px;
-            line-height: 40px;
-            padding: 0 20px;
-            font-size: 1.1em;
-            font-weight: 600;
-            border: 1px solid var(--sc-green);
-        }
-
-        /* 3. KPI / Metrics Grid */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            margin: 25px 0;
-        }
-        
-        @media (max-width: 768px) {
-            .kpi-grid {
-                grid-template-columns: 1fr;
+                switch (choice) {
+                    case 1:
+                        addCustomer();
+                        break;
+                    case 2:
+                        displayAllCustomers();
+                        break;
+                    case 3:
+                        searchCustomer();
+                        break;
+                    case 4:
+                        deleteCustomer();
+                        break;
+                    case 5:
+                        System.out.println("\nExiting the application. Thank you for using Standard Chartered Bank System.");
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please enter a number between 1 and 5.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Error: Invalid input. Please enter a number for your choice.");
+                scanner.nextLine(); // Clear the buffer
+                choice = 0; // Set choice to 0 to re-run the loop
+            } catch (Exception e) {
+                System.out.println("An unexpected error occurred: " + e.getMessage());
+                choice = 0;
             }
-        }
+            
+            System.out.println("-------------------------------------------------------");
 
-        .kpi-block {
-            padding: 15px;
-            height: 90px;
-            background-color: #fff; 
-        }
-
-        .kpi-label {
-            height: 15px;
-            width: 100%;
-            background-color: transparent;
-            margin-bottom: 8px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--sc-text-dark); 
-            font-size: 0.9em;
-        }
-
-        /* Use Blue and Green alternately for KPI values */
-        .kpi-value {
-            height: 30px;
-            width: 40%;
-            background-color: var(--sc-blue); /* Default KPI value is Blue */
-            border: 1px solid var(--border-color);
-            margin-top: 5px;
-        }
+        } while (choice != 5);
         
-        .kpi-block:nth-child(2) .kpi-value {
-            background-color: var(--sc-green); /* Second KPI value is Vibrant Green */
-        }
-        .kpi-block:nth-child(3) .kpi-value {
-            background-color: var(--sc-blue); /* Third KPI value is Blue */
+        scanner.close();
+    }
+
+    // --- Menu Display ---
+    private static void displayMenu() {
+        System.out.println("\nWelcome to Standard Chartered Bank");
+        System.out.println("1 for Add new Customer");
+        System.out.println("2 for Display Customers");
+        System.out.println("3 for Search Customer");
+        System.out.println("4 for Delete Customer");
+        System.out.println("5 for Exit the bank application");
+    }
+
+    // --- Customer Data Validation ---
+    private static boolean validate(String name, String contact, String mailId, String accountType) {
+        // 1. Name validation: Only alphabets
+        if (!name.matches("[a-zA-Z\\s]+")) {
+            System.err.println("Validation Error: Customer name must contain only alphabets.");
+            return false;
         }
 
-        /* 4. Main Table/Queue Block */
-        .table-container {
-            padding: 15px;
-            min-height: 400px;
+        // 2. Contact validation: Exactly 10 digits
+        if (!contact.matches("\\d{10}")) {
+            System.err.println("Validation Error: Contact number must be exactly 10 digits.");
+            return false;
         }
 
-        .table-title-block {
-            height: 25px;
-            width: 300px;
-            background-color: #e0e0e0;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-            line-height: 25px;
-            padding-left: 5px;
+        // 3. Email validation: Basic format check
+        if (!mailId.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
+            System.err.println("Validation Error: Email should be a valid format (e.g., example@domain.com).");
+            return false;
         }
+
+        // 4. Account Type validation: Either 'Savings' or 'Current' (case-insensitive)
+        String standardizedAccountType = accountType.toLowerCase();
+        if (!standardizedAccountType.equals("savings") && !standardizedAccountType.equals("current")) {
+            System.err.println("Validation Error: Account type must be either 'Savings' or 'Current'.");
+            return false;
+        }
+
+        return true; // All validations passed
+    }
+    
+    // --- 1: Add Customer ---
+    private static void addCustomer() {
+        System.out.println("\n--- Add New Customer Details ---");
         
-        /* Table Structure */
-        .table-row {
-            display: flex;
-            padding: 8px 0;
-            border-bottom: 1px solid #e0e0e0; 
-            font-size: 0.9em;
+        System.out.print("Enter name: ");
+        String name = scanner.nextLine().trim();
+
+        System.out.print("Enter contact: ");
+        String contact = scanner.nextLine().trim();
+
+        System.out.print("Enter mail id: ");
+        String mailId = scanner.nextLine().trim();
+
+        System.out.print("Enter account type (Savings or Current): ");
+        String accountType = scanner.nextLine().trim();
+
+        if (validate(name, contact, mailId, accountType)) {
+            // Standardize account type before adding
+            String finalAccountType = accountType.substring(0, 1).toUpperCase() + accountType.substring(1).toLowerCase();
+            
+            Customer newCustomer = new Customer(name, contact, mailId, finalAccountType);
+            customerList.add(newCustomer);
+            System.out.printf("Customer added successfully with customer id %d\n", newCustomer.getCustomerId());
+        } else {
+            System.err.println("Customer not added due to invalid entry.");
         }
+    }
+
+    // --- 2: Display All Customers ---
+    private static void displayAllCustomers() {
+        System.out.println("\n--- All Customer Details ---");
+        if (customerList.isEmpty()) {
+            System.out.println("No customers found in the system.");
+            return;
+        }
+        for (Customer customer : customerList) {
+            System.out.println(customer);
+        }
+    }
+    
+    // --- 3: Search Customer ---
+    private static void searchCustomer() {
+        System.out.println("\n--- Search Customer ---");
+        System.out.print("Please enter customer id: ");
         
-        .table-header-row {
-            /* Alternating subtle blue and green for the header background */
-            background: linear-gradient(90deg, var(--light-blue) 50%, var(--light-green) 100%);
-            font-weight: bold;
-            padding: 10px 0;
-            border-bottom: 2px solid var(--sc-blue); 
-            color: var(--sc-text-dark); /* Dark text for readability */
-        }
+        try {
+            int searchId = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
 
-        /* Placeholder styles for data cells */
-        .data-placeholder { 
-            height: 15px; 
-            margin-right: 15px;
-            line-height: 15px;
-        }
-
-        .table-col-id { width: 10%; }
-        .table-col-customer { width: 20%; }
-        .table-col-type { width: 10%; }
-        .table-col-amount { width: 15%; }
-        .table-col-comment { width: 25%; }
-        .table-col-actions { width: 15%; display: flex; gap: 10px; }
-        
-        /* Action buttons in wireframe */
-        .action-button-placeholder {
-            width: 48%;
-            height: 25px;
-            background-color: var(--sc-green); /* VIBRANT Green for Approve */
-            line-height: 25px;
-            text-align: center;
-            font-size: 0.8em;
-            color: white;
-            border: 1px solid var(--sc-text-dark);
-        }
-        /* Override for Reject (Standard professional Red) */
-        .action-button-placeholder:nth-child(2) {
-             background-color: #d9534f; 
-        }
-
-
-        .pagination-block {
-            height: 30px;
-            width: 250px;
-            background-color: #e0e0e0;
-            margin-top: 20px;
-            float: right;
-            border: 1px solid var(--border-color);
-            line-height: 30px;
-            text-align: center;
-            font-size: 0.9em;
-        }
-        
-        /* Mobile Visibility for Table */
-        @media (max-width: 768px) {
-            .table-col-comment {
-                display: none;
+            Customer foundCustomer = null;
+            for (Customer customer : customerList) {
+                if (customer.getCustomerId() == searchId) {
+                    foundCustomer = customer;
+                    break;
+                }
             }
-            .table-col-id { width: 15%; }
-            .table-col-customer { width: 30%; }
-            .table-col-type { width: 15%; }
-            .table-col-amount { width: 20%; }
-            .table-col-actions { width: 20%; }
+
+            if (foundCustomer != null) {
+                System.out.println("Customer Found!");
+                System.out.println(foundCustomer);
+            } else {
+                System.out.println("Customer with ID " + searchId + " not found.");
+            }
+            
+        } catch (InputMismatchException e) {
+            System.err.println("Invalid input. Please enter a numerical Customer ID.");
+            scanner.nextLine(); // Clear buffer
         }
-    </style>
-</head>
-<body>
+    }
 
-    <!-- 1. Navbar Block (SC Blue - Structural) -->
-    <div class="navbar-block">
-        <div>SC BANK - LOS CHECKER</div>
-        <div class="nav-links">
-            <div>Verified Applications</div>
-            <div>Approved</div>
-            <div>Rejected</div>
-            <div style="position: relative;">Notifications <span style="position: absolute; top: -5px; right: -10px; width: 12px; height: 12px; background-color: red; border-radius: 50%;"></span></div>
-        </div>
-        
-        <!-- User Dropdown Menu -->
-        <div class="nav-user">
-            User Dropdown Menu
-            <div class="user-dropdown">
-                <div>My Profile</div>
-                <div>Change Password</div>
-                <div>Settings</div>
-                <div style="color: #d9534f; font-weight: bold;">Logout</div>
-            </div>
-        </div>
-    </div>
+    // --- 4: Delete Customer ---
+    private static void deleteCustomer() {
+        System.out.println("\n--- Delete Customer ---");
+        System.out.print("Please enter customer id to be deleted: ");
 
-    <div class="container">
-        
-        <!-- 2. Banner Block (SC Green - Balanced Branding) -->
-        <div class="banner-block">
-            VERIFIED LOAN PROCESSING CENTER
-        </div>
+        try {
+            int deleteId = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
 
-        <!-- Section Title -->
-        <div style="margin-top: 25px; margin-bottom: 10px; font-size: 1.2em; font-weight: bold; color: var(--sc-blue);">Final Review Queue</div>
+            boolean wasDeleted = customerList.removeIf(customer -> customer.getCustomerId() == deleteId);
 
-        <!-- 3. KPI / Metrics Grid -->
-        <div class="kpi-grid">
-            <div class="kpi-block block">
-                <div class="kpi-label">TOTAL IN QUEUE</div>
-                <div class="kpi-value"></div>
-            </div>
-            <div class="kpi-block block">
-                <div class="kpi-label">APPROVALS TODAY</div>
-                <div class="kpi-value"></div>
-            </div>
-            <div class="kpi-block block">
-                <div class="kpi-label">SLA RISK</div>
-                <div class="kpi-value"></div>
-            </div>
-        </div>
-
-        <!-- 4. Main Table/Queue Block -->
-        <div class="table-container block">
-            <div class="table-title-block">Current Workflow Items</div>
+            if (wasDeleted) {
+                System.out.printf("Deleted customer with id = %d\n", deleteId);
+            } else {
+                System.out.println("Customer with ID " + deleteId + " not found. Deletion failed.");
+            }
             
-            <!-- Table Headers -->
-            <div class="table-row table-header-row">
-                <div class="table-col-id data-placeholder">Loan ID</div>
-                <div class="table-col-customer data-placeholder">Customer</div>
-                <div class="table-col-type data-placeholder">Type</div>
-                <div class="table-col-amount data-placeholder">Amount</div>
-                <div class="table-col-comment data-placeholder" style="display: block;">Maker Comment</div>
-                <div class="table-col-actions data-placeholder">Actions</div>
-            </div>
-
-            <!-- Table Rows (Real Data) -->
-            <div class="table-row">
-                <div class="table-col-id data-placeholder">LNS-9012</div>
-                <div class="table-col-customer data-placeholder">Rhea Sharma</div>
-                <div class="table-col-type data-placeholder">Home</div>
-                <div class="table-col-amount data-placeholder">45,00,000</div>
-                <div class="table-col-comment data-placeholder">All documents verified; clear CIBIL.</div>
-                <div class="table-col-actions">
-                    <div class="action-button-placeholder">Approve</div>
-                    <div class="action-button-placeholder">Reject</div>
-                </div>
-            </div>
-             <div class="table-row">
-                <div class="table-col-id data-placeholder">LNS-8955</div>
-                <div class="table-col-customer data-placeholder">Arjun Singh</div>
-                <div class="table-col-type data-placeholder">Vehicle</div>
-                <div class="table-col-amount data-placeholder">8,50,000</div>
-                <div class="table-col-comment data-placeholder">Income proof strong; minor address discrepancy.</div>
-                <div class="table-col-actions">
-                    <div class="action-button-placeholder">Approve</div>
-                    <div class="action-button-placeholder">Reject</div>
-                </div>
-            </div>
-             <div class="table-row">
-                <div class="table-col-id data-placeholder">LNS-8941</div>
-                <div class="table-col-customer data-placeholder">Priya Kulkarni</div>
-                <div class="table-col-type data-placeholder">Personal</div>
-                <div class="table-col-amount data-placeholder">2,00,000</div>
-                <div class="table-col-comment data-placeholder">Self-employed ITR for 2 years attached.</div>
-                <div class="table-col-actions">
-                    <div class="action-button-placeholder">Approve</div>
-                    <div class="action-button-placeholder">Reject</div>
-                </div>
-            </div>
-             <div class="table-row">
-                <div class="table-col-id data-placeholder">LNS-8890</div>
-                <div class="table-col-customer data-placeholder">Karan Verma</div>
-                <div class="table-col-type data-placeholder">Home</div>
-                <div class="table-col-amount data-placeholder">95,00,000</div>
-                <div class="table-col-comment data-placeholder">High amount, re-verified property papers.</div>
-                <div class="table-col-actions">
-                    <div class="action-button-placeholder">Approve</div>
-                    <div class="action-button-placeholder">Reject</div>
-                </div>
-            </div>
-            
-            <div class="pagination-block">Pagination / Page Size Control</div>
-        </div>
-
-    </div>
-
-</body>
-</html>
+        } catch (InputMismatchException e) {
+            System.err.println("Invalid input. Please enter a numerical Customer ID.");
+            scanner.nextLine(); // Clear buffer
+        }
+    }
+}
 
 
 
