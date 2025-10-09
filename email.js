@@ -60,37 +60,42 @@ public class Customer_Usecase2 {
 
 
 
+package com.exercise.app;
 
+import com.exercise.model.Customer_Usecase2;
 
-package com.exercise.model;
+public class UseCase2_Demo {
+    public static void main(String[] args) {
+        // Create 3 customer class objects using parameterized constructor
+        Customer_Usecase2 customerA = new Customer_Usecase2(
+            1001, "Amit Sharma", "amit@test.com", 
+            50000.00, "Sales", "Pune", "9876543210", "Savings"
+        );
+        
+        Customer_Usecase2 customerB = new Customer_Usecase2(
+            1002, "Bela Singh", "bela@test.com", 
+            75000.50, "IT", "Bangalore", "9988776655", "Current"
+        );
+        
+        Customer_Usecase2 customerC = new Customer_Usecase2(
+            1003, "Chandan Gupta", "chandan@test.com", 
+            60000.00, "HR", "Delhi", "9001122334", "Savings"
+        );
+        
+        // Insert them into an array of customers
+        Customer_Usecase2[] customerArray = new Customer_Usecase2[] {
+            customerA, 
+            customerB, 
+            customerC
+        };
 
-// Note: This model has different fields as per the second set of requirements
-public class Customer_Usecase2 {
-    private int customerid;
-    private String name;
-    private String mailid;
-    private double salary; 
-    private String dept;
-    private String location;
-    private String contact;
-    private String accountType;
-
-    // Parameterized Constructor (required)
-    public Customer_Usecase2(int customerid, String name, String mailid, double salary, String dept, String location, String contact, String accountType) {
-        this.customerid = customerid;
-        this.name = name;
-        this.mailid = mailid;
-        this.salary = salary;
-        this.dept = dept;
-        this.location = location;
-        this.contact = contact;
-        this.accountType = accountType;
-    }
-
-    // Overriding toString() for display (required)
-    @Override
-    public String toString() {
-        return String.format("Customer ID: %d, Name: %s, Email: %s, Salary: $%.2f, Dept: %s, Location: %s, Contact: %s, Account Type: %s",
-                customerid, name, mailid, salary, dept, location, contact, accountType);
+        System.out.println("--- Use Case 2: Array Iteration Demo ---");
+        
+        // Finally iterate the array and display all customer objects.
+        for (Customer_Usecase2 customer : customerArray) {
+            System.out.println(customer);
+        }
+        System.out.println("----------------------------------------");
     }
 }
+
