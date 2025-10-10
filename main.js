@@ -28,315 +28,271 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-package com.bank.model;
 
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class Customer {
-    // For auto-generating customer IDs starting from a base number (e.g., 1000 or 4000)
-    private static final AtomicInteger ID_GENERATOR = new AtomicInteger(1000); 
 
-    private final int customerid; // Final since it's auto-generated and immutable
-    private String name;
-    private String mailid;
-    private String contact;
-    private String accountType;
+import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import { Modal } from "bootstrap";
 
-    // Parameterized Constructor
-    public Customer(String name, String mailid, String contact, String accountType) {
-        // Auto-generate ID upon creation
-        this.customerid = ID_GENERATOR.getAndIncrement(); 
-        this.name = name;
-        this.mailid = mailid;
-        this.contact = contact;
-        this.accountType = accountType;
+export default function CheckerDashboard() {
+  const initialApplications = [
+    { id: "SCW1005", customer: "Deepak Sharma", type: "Home Loan", amount: 8500000, comment: "All documents verified, CIBIL 780. Ready for final check.", status: "Pending" },
+    { id: "SCW1006", customer: "Anjali Verma", type: "Personal Loan", amount: 750000, comment: "ITR matches salary slips, minor address variance noted (Maker Comment)", status: "Pending" },
+    { id: "SCW1007", customer: "Rajesh Patil", type: "Vehicle Loan", amount: 1200000, comment: "Vehicle quotation received, employment history confirmed.", status: "Pending" },
+    { id: "SCW1008", customer: "Pooja Singh", type: "Personal Loan", amount: 300000, comment: "Minor discrepancy in PAN and Aadhaar name spelling. Checker review required.", status: "Pending" },
+    { id: "SCW1009", customer: "Vikram K.", type: "Home Loan", amount: 6000000, comment: "High-value case, EC clear, Maker recommends approval.", status: "Pending" },
+    { id: "SCW1010", customer: "Geeta Iyer", type: "Vehicle Loan", amount: 950000, comment: "All documents are clean. Low risk profile.", status: "Pending" },
+    { id: "SCW1011", customer: "Amit Taneja", type: "Personal Loan", amount: 400000, comment: "Recent salary increase noted. Good risk profile.", status: "Pending" },
+    { id: "SCW1012", customer: "Nisha Soni", type: "Vehicle Loan", amount: 1500000, comment: "New application, all docs present.", status: "Pending" },
+    { id: "SCW1013", customer: "Babu Rao", type: "Home Loan", amount: 9000000, comment: "Requires additional property verification.", status: "Pending" },
+    { id: "SCW1014", customer: "Smita Wagh", type: "Personal Loan", amount: 800000, comment: "Standard processing, no issues.", status: "Pending" },
+    { id: "SCW1015", customer: "Kunal Deshmukh", type: "Home Loan", amount: 7200000, comment: "Maker has flagged minor reference issue.", status: "Pending" },
+  ];
+
+  const [applications, setApplications] = useState(initialApplications);
+  const [currentLoan, setCurrentLoan] = useState(null);
+  const [currentAction, setCurrentAction] = useState(null);
+  const [comment, setComment] = useState("");
+  const [modalInstance, setModalInstance] = useState(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const modalEl = document.getElementById("actionModal");
+    if (modalEl) setModalInstance(new Modal(modalEl));
+  }, []);
+
+  const openModal = (loan, action) => {
+    setCurrentLoan(loan);
+    setCurrentAction(action);
+    setComment("");
+    setError("");
+    modalInstance?.show();
+  };
+
+  const handleConfirm = () => {
+    if (currentAction === "REJECT" && !comment.trim()) {
+      setError("Comment is mandatory for rejection.");
+      return;
     }
+    setError("");
 
-    // Getters
-    public int getCustomerid() {
-        return customerid;
-    }
+    const updatedApps = applications.map((a) =>
+      a.id === currentLoan.id
+        ? {
+            ...a,
+            status: currentAction === "APPROVE" ? "Approved" : "Rejected",
+            checkerComment: comment.trim(),
+          }
+        : a
+    );
 
-    public String getName() {
-        return name;
-    }
+    setApplications(updatedApps);
+    modalInstance?.hide();
+  };
 
-    public String getMailid() {
-        return mailid;
-    }
+  const pendingApps = applications.filter((a) => a.status === "Pending");
 
-    public String getContact() {
-        return contact;
-    }
+  return (
+    <div>
+      {/* NAVBAR */}
+      <nav className="navbar navbar-expand-lg top-navbar fixed-top" data-bs-theme="dark">
+        <div className="container-fluid">
+          <a className="navbar-brand navbar-brand-custom" href="#">
+            LOS <span className="badge bg-primary text-white fs-6">CHECKER</span>
+          </a>
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+            <span className="navbar-toggler-icon"></span>
+          </button>
 
-    public String getAccountType() {
-        return accountType;
-    }
+          <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div className="navbar-nav mx-auto">
+              <a className="nav-link active" href="#">
+                <i className="bi bi-inbox-fill me-2"></i> Verified Applications
+              </a>
+              <a className="nav-link approved-link" href="#">Approved</a>
+              <a className="nav-link rejected-link" href="#">Rejected</a>
+            </div>
 
-    // Overriding toString() for easy display
-    @Override
-    public String toString() {
-        return "Customer Id = " + customerid + 
-               ", Customer name = " + name + 
-               ", Customer email = " + mailid + 
-               ", Customer contact = " + contact + 
-               ", Account Type = " + accountType;
-    }
+            <div className="navbar-nav ms-auto d-flex align-items-center">
+              <a className="nav-link nav-icon-link me-3" href="#">
+                <i className="bi bi-bell-fill fs-5"></i>
+                <span className="badge bg-danger rounded-circle position-absolute">{pendingApps.length + 3}</span>
+              </a>
+
+              <div className="dropdown">
+                <a className="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                  <i className="bi bi-person-circle fs-4 me-2"></i>
+                  <span className="small fw-semibold">John Doe (JD2345)</span>
+                </a>
+                <ul className="dropdown-menu dropdown-menu-end">
+                  <li><h6 className="dropdown-header">JD2345 - Checker</h6></li>
+                  <li><a className="dropdown-item" href="#"><i className="bi bi-person me-2"></i> My Profile</a></li>
+                  <li><a className="dropdown-item" href="#"><i className="bi bi-gear me-2"></i> Workflow Settings</a></li>
+                  <li><a className="dropdown-item" href="#"><i className="bi bi-question-circle me-2"></i> Help & Support</a></li>
+                  <li><hr className="dropdown-divider" /></li>
+                  <li><a className="dropdown-item text-danger" href="#"><i className="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* MAIN CONTENT */}
+      <main className="content-area">
+        <div className="banking-image-container d-flex align-items-center justify-content-between">
+          <p className="image-text mb-0">
+            <i className="bi bi-shield-check"></i> VERIFIED LOAN PROCESSING CENTER
+          </p>
+          <p className="text-muted mb-0 d-none d-sm-block small">Reviewing Applications: 2/6 completed</p>
+        </div>
+
+        <h5 className="mb-1 text-dark fw-bolder">Final Review Queue</h5>
+        <p className="text-muted small mb-3">Applications verified by the Maker team are listed here for final approval.</p>
+
+        {/* KPIs */}
+        <div className="row mb-3">
+          <KpiCard title="TOTAL IN QUEUE" value={pendingApps.length} icon="clock-history" color="var(--accent-blue)" note="Pending action" />
+          <KpiCard title="APPROVALS TODAY" value="12" icon="check-circle" color="var(--success-color)" note="Successfully processed" />
+          <KpiCard title="SLA RISK" value="2" icon="hourglass-split" color="var(--danger-color)" note="Approaching service limit" />
+        </div>
+
+        {/* TABLE */}
+        <div className="card data-table-card">
+          <div className="card-header card-header-custom">
+            <i className="bi bi-table me-2"></i> Applications Pending Final Review
+          </div>
+          <div className="card-body p-0">
+            <div className="table-responsive">
+              <table className="table table-hover mb-0">
+                <thead className="bg-light sticky-top">
+                  <tr>
+                    <th>Loan ID</th>
+                    <th>Customer</th>
+                    <th>Type</th>
+                    <th>Amount (INR)</th>
+                    <th className="d-none d-sm-table-cell">Maker Comment</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingApps.map((app) => (
+                    <tr key={app.id}>
+                      <td className="fw-bold">{app.id}</td>
+                      <td>{app.customer}</td>
+                      <td><span className="badge badge-loan-type">{app.type.toUpperCase()}</span></td>
+                      <td className="fw-semibold">₹ {app.amount.toLocaleString("en-IN")}</td>
+                      <td className="small text-muted d-none d-sm-table-cell">{app.comment}</td>
+                      <td className="action-cell">
+                        <button className="btn btn-sm btn-approve me-2" onClick={() => openModal(app, "APPROVE")}>Approve</button>
+                        <button className="btn btn-sm btn-reject" onClick={() => openModal(app, "REJECT")}>Reject</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="card-footer d-flex justify-content-between align-items-center py-2">
+            <span className="text-muted small">Showing {pendingApps.length} of {pendingApps.length} applications.</span>
+            <nav>
+              <ul className="pagination pagination-sm mb-0">
+                <li className="page-item disabled"><a className="page-link rounded-pill me-1" href="#">&laquo;</a></li>
+                <li className="page-item active"><a className="page-link rounded-pill me-1" href="#">1</a></li>
+                <li className="page-item"><a className="page-link rounded-pill me-1" href="#">2</a></li>
+                <li className="page-item"><a className="page-link rounded-pill" href="#">&raquo;</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </main>
+
+      {/* MODAL */}
+      <div className="modal fade" id="actionModal" tabIndex="-1" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content rounded-4 shadow-lg">
+            <div
+              className="modal-header text-white"
+              style={{
+                backgroundColor:
+                  currentAction === "APPROVE"
+                    ? "var(--success-color)"
+                    : currentAction === "REJECT"
+                    ? "var(--danger-color)"
+                    : "#0d6efd",
+              }}
+            >
+              <h5 className="modal-title">
+                Process Loan <span>{currentLoan?.id}</span>
+              </h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              <p className="lead text-center fw-bold">
+                {currentLoan
+                  ? `You are about to ${currentAction} the loan application for ${currentLoan.customer}.`
+                  : ""}
+              </p>
+
+              <div className="mb-3">
+                <label className="form-label fw-bold">
+                  {currentAction === "REJECT"
+                    ? "Checker Comments (Mandatory for Rejection)"
+                    : "Checker Comments (Optional for Approval)"}
+                </label>
+                <textarea
+                  className="form-control rounded-3"
+                  rows="3"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Enter reason for rejection or approval notes..."
+                />
+              </div>
+
+              {error && <div className="alert alert-danger mb-3">{error}</div>}
+
+              <div
+                className="alert small rounded-3"
+                style={{ backgroundColor: "#e9ecef", color: "var(--text-dark)" }}
+              >
+                <i className="bi bi-info-circle me-1"></i>
+                Finalizing this action updates the database and triggers notifications to the Maker and Customer.
+              </div>
+            </div>
+
+            <div className="modal-footer justify-content-between">
+              <button className="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+                Cancel
+              </button>
+              <button
+                className={`btn ${currentAction === "REJECT" ? "btn-reject" : "btn-approve"} rounded-pill`}
+                onClick={handleConfirm}
+              >
+                Confirm Action
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-
-
-package com.bank.exception;
-
-// All business rule validation failures will throw this exception.
-public class ValidationException extends Exception {
-    public ValidationException(String message) {
-        super(message);
-    }
+function KpiCard({ title, value, icon, color, note }) {
+  return (
+    <div className="col-lg-4 col-md-4 col-12 mb-3">
+      <div className="card kpi-card" style={{ borderLeftColor: color }}>
+        <div className="card-body py-2">
+          <h6 className="card-title small fw-semibold mb-1" style={{ color }}>
+            <i className={`bi bi-${icon} me-2`}></i> {title}
+          </h6>
+          <p className="card-text fs-4 fw-bolder mb-1">{value}</p>
+          <span className="text-muted small">{note}</span>
+        </div>
+      </div>
+    </div>
+  );
 }
-
-
-package com.bank.service;
-
-import com.bank.exception.ValidationException;
-
-public class CustomerValidator {
-
-    /**
-     * Validates all required fields for a new customer entry.
-     * @param name Customer name
-     * @param mailid Customer email
-     * @param contact Customer 10-digit contact number
-     * @param accountType Account type (Savings or Current)
-     * @throws ValidationException if any field fails its corresponding validation rule.
-     */
-    public void validate(String name, String mailid, String contact, String accountType) throws ValidationException {
-        // 1. Name validation (only alphabets)
-        if (!name.matches("[a-zA-Z\\s]+")) { // Allowing spaces for full names
-            throw new ValidationException("Invalid Name: Name can only contain alphabets and spaces.");
-        }
-
-        // 2. Email validation (basic regex check)
-        if (!mailid.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")) {
-            throw new ValidationException("Invalid Email: Email format is invalid or not provided.");
-        }
-
-        // 3. Contact validation (must be exactly 10 digits)
-        if (!contact.matches("\\d{10}")) {
-            throw new ValidationException("Invalid Contact: Contact number must have exactly 10 digits.");
-        }
-
-        // 4. Account Type validation (case-insensitive check)
-        String standardizedAccountType = accountType.trim().toLowerCase();
-        if (!standardizedAccountType.equals("savings") && !standardizedAccountType.equals("current")) {
-            throw new ValidationException("Invalid Account Type: Account type must be 'Savings' or 'Current'.");
-        }
-    }
-}
-
-
-package com.bank.service;
-
-import com.bank.model.Customer;
-import java.util.ArrayList;
-import java.util.List;
-
-public class CustomerManager {
-    // Requirement: Convert array into ArrayList (using List interface for flexibility)
-    private List<Customer> customerList = new ArrayList<>();
-
-    // For injecting the Validator dependency (dependency inversion principle)
-    private final CustomerValidator validator = new CustomerValidator();
-
-    /**
-     * Adds a new customer after successful validation.
-     * @param name, mailid, contact, accountType Raw input data.
-     * @return The newly created Customer object.
-     */
-    public Customer addNewCustomer(String name, String mailid, String contact, String accountType) throws Exception {
-        // Validation is delegated to the Validator class
-        validator.validate(name, mailid, contact, accountType);
-
-        // If validation passes, create the object (which auto-generates the ID)
-        Customer newCustomer = new Customer(name, mailid, contact, accountType);
-        customerList.add(newCustomer);
-        return newCustomer;
-    }
-
-    /**
-     * Retrieves all customers in the system.
-     * @return A list of all customers.
-     */
-    public List<Customer> getAllCustomers() {
-        return customerList;
-    }
-
-    /**
-     * Searches for a customer by ID.
-     * @param customerId The ID to search for.
-     * @return The Customer object if found, or null otherwise.
-     */
-    public Customer searchCustomer(int customerId) {
-        // Use stream API for modern, efficient searching
-        return customerList.stream()
-                           .filter(c -> c.getCustomerid() == customerId)
-                           .findFirst()
-                           .orElse(null);
-    }
-
-    /**
-     * Deletes a customer by ID.
-     * @param customerId The ID to delete.
-     * @return true if a customer was deleted, false otherwise.
-     */
-    public boolean deleteCustomer(int customerId) {
-        // Uses the List removeIf method for concise deletion
-        return customerList.removeIf(c -> c.getCustomerid() == customerId);
-    }
-}
-
-package com.bank.app;
-
-import com.bank.exception.ValidationException;
-import com.bank.model.Customer;
-import com.bank.service.CustomerManager;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
-
-public class BankCustomerManagementSystemApp {
-
-    // Dependency Injection: Manager handles all business logic and data
-    private final CustomerManager manager = new CustomerManager();
-    private final Scanner scanner = new Scanner(System.in);
-
-    private void displayMenu() {
-        System.out.println("\n==============================================");
-        System.out.println("Welcome to Standard Chartered Bank");
-        System.out.println("Please enter your choice:");
-        System.out.println("1 for Add New Customer");
-        System.out.println("2 for Display Customers");
-        System.out.println("3 for Search Customer");
-        System.out.println("4 for Delete Customer");
-        System.out.println("5 for Exit the bank application");
-        System.out.print("Choice: ");
-    }
-
-    private void handleAddCustomer() {
-        System.out.println("\nPlease enter customer details:");
-        System.out.print("Enter name: ");
-        String name = scanner.nextLine().trim();
-
-        System.out.print("Enter email: ");
-        String mailid = scanner.nextLine().trim();
-
-        System.out.print("Enter contact (10 digits): ");
-        String contact = scanner.nextLine().trim();
-
-        System.out.print("Enter account type (Savings or Current): ");
-        String accountType = scanner.nextLine().trim();
-
-        try {
-            Customer newCustomer = manager.addNewCustomer(name, mailid, contact, accountType);
-            System.out.println("Customer added successfully with customer id " + newCustomer.getCustomerid());
-        } catch (ValidationException e) {
-            // Requirement: If any condition fails, display the appropriate error message using custom exceptions.
-            System.err.println("\n[ERROR] Failed to add customer: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("\n[ERROR] An unexpected error occurred: " + e.getMessage());
-        }
-    }
-
-    private void handleDisplayCustomers() {
-        // Requirement: If user enters 2, display all existing customer details.
-        List<Customer> allCustomers = manager.getAllCustomers();
-        System.out.println("\n--- All Existing Customers ---");
-        if (allCustomers.isEmpty()) {
-            System.out.println("No customers currently in the system.");
-            return;
-        }
-
-        for (Customer customer : allCustomers) {
-            System.out.println(customer);
-        }
-        System.out.println("------------------------------");
-    }
-
-    private void handleSearchCustomer() {
-        // Requirement: If user enters 3, display the matched customer details.
-        System.out.print("\nPlease enter customer id to search: ");
-        try {
-            // Requirement: Make sure customer id input has to be an integer
-            int searchId = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-
-            Customer foundCustomer = manager.searchCustomer(searchId);
-
-            if (foundCustomer != null) {
-                System.out.println("\n--- Customer Found ---");
-                System.out.println(foundCustomer);
-                System.out.println("----------------------");
-            } else {
-                System.out.println("Customer with ID " + searchId + " not found.");
-            }
-        } catch (InputMismatchException e) {
-            // Requirement: Display the appropriate error message using custom exceptions (or clear error).
-            System.err.println("\n[ERROR] Invalid Search ID: Customer ID must be a valid integer.");
-            scanner.nextLine(); // Clear the invalid input
-        }
-    }
-
-    private void handleDeleteCustomer() {
-        // Requirement: If user enters 4, delete the matched customer details.
-        System.out.print("\nPlease enter customer id to be deleted: ");
-        try {
-            int deleteId = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-
-            if (manager.deleteCustomer(deleteId)) {
-                System.out.println("Deleted customer with id = " + deleteId);
-            } else {
-                System.out.println("Customer with ID " + deleteId + " not found for deletion.");
-            }
-        } catch (InputMismatchException e) {
-            System.err.println("\n[ERROR] Invalid Deletion ID: Customer ID must be a valid integer.");
-            scanner.nextLine(); // Clear the invalid input
-        }
-    }
-
-    public void startApplication() {
-        int choice = 0;
-        
-        while (choice != 5) {
-            displayMenu();
-            try {
-                choice = scanner.nextInt();
-                scanner.nextLine(); // Consume the newline character
-
-                switch (choice) {
-                    case 1: handleAddCustomer(); break;
-                    case 2: handleDisplayCustomers(); break;
-                    case 3: handleSearchCustomer(); break;
-                    case 4: handleDeleteCustomer(); break;
-                    case 5: 
-                        System.out.println("\nApplication exiting. Thank you for using the Bank Customer Management System!");
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Please enter a number between 1 and 5.");
-                }
-            } catch (InputMismatchException e) {
-                System.err.println("\n[ERROR] Invalid Input. Please enter a number for your choice.");
-                scanner.nextLine(); // Clear the invalid input
-                choice = 0; // Reset choice
-            }
-        }
-        scanner.close();
-    }
-
-    public static void main(String[] args) {
-        BankCustomerManagementSystemApp app = new BankCustomerManagementSystemApp();
-        app.startApplication();
-    }
-}
-
 
