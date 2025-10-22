@@ -1,3 +1,38 @@
+# ===============================
+# Database Configuration
+# ===============================
+spring.datasource.url=jdbc:postgresql://localhost:5432/loan_origination
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+
+# ===============================
+# JPA / Hibernate Configuration
+# ===============================
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+
+# ===============================
+# Server Configuration
+# ===============================
+server.port=8080
+server.servlet.context-path=/
+
+# ===============================
+# Logging Configuration
+# ===============================
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
+logging.level.com.scb.axessspringboottraining=INFO
+
+# ===============================
+# Swagger Configuration
+# ===============================
+springdoc.api-docs.path=/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
+
+
 // email.js
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -1683,5 +1718,6 @@ public class DataInitializationService implements CommandLineRunner {
     }
 }
 ....................
+
 
 
