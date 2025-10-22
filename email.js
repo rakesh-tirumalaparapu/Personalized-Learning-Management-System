@@ -1,3 +1,25 @@
+package com.scb.axessspringboottraining;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
+
+@SpringBootApplication(exclude = {
+    SecurityAutoConfiguration.class,
+    UserDetailsServiceAutoConfiguration.class
+})
+public class AxessSpringbootTrainingApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(AxessSpringbootTrainingApplication.class, args);
+		System.out.println("\n=== CHECKER PORTAL BACKEND STARTED ===");
+		System.out.println("Swagger UI: http://localhost:8080/swagger-ui.html");
+		System.out.println("API Base URL: http://localhost:8080/api/checker");
+		System.out.println("HTML UI: Open checker-portal-ui.html in browser");
+		System.out.println("=====================================\n");
+	}
+}
 # ===============================
 # Database Configuration
 # ===============================
@@ -1718,6 +1740,7 @@ public class DataInitializationService implements CommandLineRunner {
     }
 }
 ....................
+
 
 
 
