@@ -1,3 +1,67 @@
+    public ResponseEntity<Checker> createChecker(@RequestBody Checker checker) {
+        try {
+            Checker createdChecker = checkerService.createChecker(checker);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdChecker);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Validation error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+.............
+
+    @Override
+    public Checker createChecker(Checker checker) {
+        try {
+            // Validate required fields
+            if (checker.getCheckerId() == null || checker.getCheckerId().trim().isEmpty()) {
+                throw new IllegalArgumentException("Checker ID is required");
+            }
+            if (checker.getEmail() == null || checker.getEmail().trim().isEmpty()) {
+                throw new IllegalArgumentException("Email is required");
+            }
+            if (checker.getFirstName() == null || checker.getFirstName().trim().isEmpty()) {
+                throw new IllegalArgumentException("First name is required");
+            }
+            if (checker.getLastName() == null || checker.getLastName().trim().isEmpty()) {
+                throw new IllegalArgumentException("Last name is required");
+            }
+            if (checker.getPhone() == null || checker.getPhone().trim().isEmpty()) {
+                throw new IllegalArgumentException("Phone is required");
+            }
+            if (checker.getDepartment() == null || checker.getDepartment().trim().isEmpty()) {
+                throw new IllegalArgumentException("Department is required");
+            }
+            if (checker.getDesignation() == null || checker.getDesignation().trim().isEmpty()) {
+                throw new IllegalArgumentException("Designation is required");
+            }
+            
+            if (checkerDAO.existsByCheckerId(checker.getCheckerId())) {
+                throw new IllegalArgumentException("Checker ID already exists: " + checker.getCheckerId());
+            }
+            if (checkerDAO.existsByEmail(checker.getEmail())) {
+                throw new IllegalArgumentException("Email already exists: " + checker.getEmail());
+            }
+            
+            // Ensure createdAt is set
+            if (checker.getCreatedAt() == null) {
+                checker.setCreatedAt(LocalDateTime.now());
+            }
+            
+            return checkerDAO.save(checker);
+        } catch (Exception e) {
+            System.err.println("Error creating checker: " + e.getMessage());
+            throw e;
+        }
+    }
+
+
+
+
 package com.scb.axessspringboottraining;
 
 import org.springframework.boot.SpringApplication;
@@ -1740,6 +1804,7 @@ public class DataInitializationService implements CommandLineRunner {
     }
 }
 ....................
+
 
 
 
