@@ -149,10 +149,17 @@
    display: inline-flex;
    align-items: center;
    justify-content: center;
+   line-height: 1.5;
+   vertical-align: middle;
  }
- .usecase2 .no-applications .btn-primary-custom .bi { 
+ .usecase2 .no-applications .btn-primary-custom .bi,
+ .usecase2 .no-applications .btn-primary-custom i { 
    font-size: 0.875rem; 
    margin-right: 6px;
+   line-height: 1;
+   vertical-align: middle;
+   display: inline-flex;
+   align-items: center;
  }
  .usecase2 .summary-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e0e0e0; }
  .usecase2 .summary-item label { color: #7f8c8d; font-weight: 500; }
