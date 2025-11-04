@@ -1,335 +1,196 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { listCheckerApplications } from "../api/apiChecker";
-// Removed static applications JSON; will integrate with backend APIs
-import "./CheckerDashboard.css";
-import { formatLoanType } from "../utils/enumFormatters";
 
-export default function CheckerDashboard() {
-  const [applications, setApplications] = useState([]);
-  const [filteredApplications, setFilteredApplications] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [loanTypeFilter, setLoanTypeFilter] = useState("all");
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Removed mock data; use backend data later
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const data = await listCheckerApplications();
-        if (!mounted) return;
-        const mapped = (data || []).map((a) => {
-          // Map status: WITH_CHECKER -> pending, APPROVED -> approved, REJECTED -> rejected
-          const status = String(a.status || '').toUpperCase();
-          let mappedStatus;
-          if (status === 'WITH_CHECKER') {
-            mappedStatus = 'pending';
-          } else if (status === 'APPROVED') {
-            mappedStatus = 'approved';
-          } else if (status === 'REJECTED') {
-            mappedStatus = 'rejected';
-          } else {
-            // Skip applications not meant for checker (WITH_MAKER, PENDING, etc.)
-            return null;
-          }
-          return {
-            id: a.applicationId || a.id,
-            customerName: a.customerName || a.name,
-            loanType: formatLoanType(a.loanType),
-            loanAmount: a.loanAmount || 0,
-            status: mappedStatus,
-            email: a.email,
-            submittedDate: a.submittedDate || a.createdAt || a.date || null,
-          };
-        }).filter(Boolean); // Remove null entries
-        setApplications(mapped);
-        setFilteredApplications(mapped);
-      } catch (e) {
-        setApplications([]);
-        setFilteredApplications([]);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
-
-  useEffect(() => {
-    let filtered = applications;
-
-    // Apply search filter
-    if (searchQuery) {
-      const q = (searchQuery || '').toLowerCase().trim();
-      
-      // Helper function to format date as DD-MM-YYYY for search matching
-      const formatDateForSearch = (dateString) => {
-        if (!dateString) return '';
-        try {
-          const date = new Date(dateString);
-          if (isNaN(date.getTime())) return '';
-          const day = String(date.getDate()).padStart(2, '0');
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const year = date.getFullYear();
-          return `${day}-${month}-${year}`;
-        } catch {
-          return '';
-        }
-      };
-
-      filtered = filtered.filter(app => {
-        // Search in basic fields
-        const matchesBasic = 
-          String(app.id || '').toLowerCase().includes(q) ||
-          String(app.customerName || '').toLowerCase().includes(q) ||
-          String(app.email || '').toLowerCase().includes(q) ||
-          String(app.loanType || '').toLowerCase().includes(q);
-        
-        // Search in formatted date (DD-MM-YYYY)
-        const formattedDate = formatDateForSearch(app.submittedDate);
-        const matchesDate = formattedDate.toLowerCase().includes(q);
-        
-        return matchesBasic || matchesDate;
-      });
-    }
-
-    // Apply status filter
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(app => app.status === statusFilter);
-    }
-
-    // Apply loan type filter
-    if (loanTypeFilter !== "all") {
-      filtered = filtered.filter(app => app.loanType === loanTypeFilter);
-    }
-
-    setFilteredApplications(filtered);
-  }, [searchQuery, statusFilter, loanTypeFilter, applications]);
-
-  const getStatusBadge = (status) => {
-    const statusClasses = {
-      pending: "badge-status pending",
-      approved: "badge-status approved",
-      rejected: "badge-status rejected"
-    };
-    
-    // Format status: first letter capital, rest lowercase
-    const formatStatus = (s) => {
-      if (!s) return '';
-      const lower = String(s).toLowerCase();
-      return lower.charAt(0).toUpperCase() + lower.slice(1);
-    };
-
-    return (
-      <span className={`badge ${statusClasses[status] || 'badge-status pending'}`}>
-        {formatStatus(status)}
-      </span>
-    );
-  };
-
-  const getCibilScoreColor = (score) => {
-    if (score >= 750) return "text-success";
-    if (score >= 700) return "text-warning";
-    return "text-danger";
-  };
-
-  if (isLoading) {
-    return (
-      <div className="text-center py-5">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-        <p className="mt-3 text-muted">Loading applications...</p>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      {/* Page Header */}
-      <div className="page-hero d-flex align-items-center justify-content-center mb-4">
-        <div className="text-center text-white">
-          <h4 className="mb-1">Application Review Dashboard</h4>
-          <p className="sub mb-0">Review and process loan applications</p>
-        </div>
-      </div>
-
-      {/* Statistics Cards */}
-      <div className="row mb-4">
-        <div className="col-md-3 mb-3">
-          <div 
-            className={`kpi-card text-center ${statusFilter === "all" ? "active" : ""}`}
-            onClick={() => setStatusFilter("all")}
-            style={{ cursor: "pointer" }}
-          >
-            <h3 className="text-primary mb-1">{applications.length}</h3>
-            <p className="text-muted mb-0">Total Applications</p>
-          </div>
-        </div>
-        <div className="col-md-3 mb-3">
-          <div 
-            className={`kpi-card text-center ${statusFilter === "pending" ? "active" : ""}`}
-            onClick={() => setStatusFilter("pending")}
-            style={{ cursor: "pointer" }}
-          >
-            <h3 className="text-warning mb-1">
-              {applications.filter(app => app.status === "pending").length}
-            </h3>
-            <p className="text-muted mb-0">Pending Review</p>
-          </div>
-        </div>
-        <div className="col-md-3 mb-3">
-          <div 
-            className={`kpi-card text-center ${statusFilter === "approved" ? "active" : ""}`}
-            onClick={() => setStatusFilter("approved")}
-            style={{ cursor: "pointer" }}
-          >
-            <h3 className="text-success mb-1">
-              {applications.filter(app => app.status === "approved").length}
-            </h3>
-            <p className="text-muted mb-0">Approved</p>
-          </div>
-        </div>
-        <div className="col-md-3 mb-3">
-          <div 
-            className={`kpi-card text-center ${statusFilter === "rejected" ? "active" : ""}`}
-            onClick={() => setStatusFilter("rejected")}
-            style={{ cursor: "pointer" }}
-          >
-            <h3 className="text-danger mb-1">
-              {applications.filter(app => app.status === "rejected").length}
-            </h3>
-            <p className="text-muted mb-0">Rejected</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="section-card mb-4">
-        <div className="row g-3">
-          <div className="col-md-6">
-            <label className="form-label fw-semibold">Search Applications</label>
-            <div className="search-field">
-              <i className="bi bi-search search-icon"></i>
-              <input
-                type="text"
-                className="form-control search-input"
-                placeholder="Search by name, ID, email, loan type, or date..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="col-md-6">
-            <label className="form-label fw-semibold">Loan Type Filter</label>
-            <select 
-              className="form-select" 
-              value={loanTypeFilter} 
-              onChange={(e) => setLoanTypeFilter(e.target.value)}
-            >
-              <option value="all">All Loan Types</option>
-              <option value="Personal Loan">Personal Loan</option>
-              <option value="Home Loan">Home Loan</option>
-              <option value="Vehicle Loan">Vehicle Loan</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Applications Table */}
-      <div className="section-card">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="mb-0">Applications ({filteredApplications.length})</h5>
-          <div className="bucket-tabs">
-            <button 
-              className={`btn btn-sm ${statusFilter === "all" ? "active" : ""}`}
-              onClick={() => setStatusFilter("all")}
-            >
-              All
-            </button>
-            <button 
-              className={`btn btn-sm ${statusFilter === "pending" ? "active" : ""}`}
-              onClick={() => setStatusFilter("pending")}
-            >
-              Pending
-            </button>
-            <button 
-              className={`btn btn-sm ${statusFilter === "approved" ? "active" : ""}`}
-              onClick={() => setStatusFilter("approved")}
-            >
-              Approved
-            </button>
-            <button 
-              className={`btn btn-sm ${statusFilter === "rejected" ? "active" : ""}`}
-              onClick={() => setStatusFilter("rejected")}
-            >
-              Rejected
-            </button>
-          </div>
-        </div>
-
-        <div className="table-responsive" style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
-          <table className="table table-hover table-bordered" style={{ minWidth: '800px' }}>
-            <thead>
-              <tr>
-                <th><i className="bi bi-hash me-2"></i>Application ID</th>
-                <th><i className="bi bi-person me-2"></i>Customer Name</th>
-                <th><i className="bi bi-credit-card me-2"></i>Loan Type</th>
-                <th><i className="bi bi-currency-rupee me-2"></i>Amount</th>
-                <th><i className="bi bi-calendar3 me-2"></i>Date</th>
-                <th><i className="bi bi-info-circle me-2"></i>Status</th>
-                <th><i className="bi bi-gear me-2"></i>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredApplications.map((app) => (
-                <tr key={app.id}>
-                  <td><span className="fw-semibold text-primary">{app.id}</span></td>
-                  <td>
-                    <div className="fw-semibold">{app.customerName}</div>
-                  </td>
-                  <td>{app.loanType}</td>
-                  <td>
-                    <span className="fw-semibold">
-                      ₹{app.loanAmount.toLocaleString()}
-                    </span>
-                  </td>
-                  <td>
-                    {app.submittedDate ? (() => {
-                      const date = new Date(app.submittedDate);
-                      if (isNaN(date.getTime())) return app.submittedDate;
-                      const day = String(date.getDate()).padStart(2, '0');
-                      const month = String(date.getMonth() + 1).padStart(2, '0');
-                      const year = date.getFullYear();
-                      return `${day}-${month}-${year}`;
-                    })() : '-'}
-                  </td>
-                  <td>{getStatusBadge(app.status)}</td>
-                  <td>
-                    <Link 
-                      to={`../application/${app.id}`}
-                      state={{ status: app.status }}
-                      className="btn btn-sm btn-outline-primary review-btn"
-                    >
-                      <i className="bi bi-eye me-1"></i>
-                      Review
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {filteredApplications.length === 0 && (
-          <div className="text-center py-4">
-            <i className="bi bi-inbox display-4 text-muted"></i>
-            <p className="text-muted mt-2">No applications found matching your criteria</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+ .usecase2 * { margin: 0; padding: 0; box-sizing: border-box; }
+ .usecase2 { font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif; background: #f8f9fa; line-height: 1.6; overflow: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+ .usecase2 { height: 100%; }
+ .usecase2 { --navbar-height: 64px; }
+ .usecase2 .app-container { display: flex; flex-direction: column; height: 100vh; }
+ .usecase2.app-container { position: fixed; inset: 0; }
+ .usecase2 .main-content { display: flex; flex: 1; overflow: hidden; height: calc(100vh - var(--navbar-height)); }
+ .usecase2 .content-area { flex: 1; overflow-y: auto; background: #f8f9fa; padding-top: calc(var(--navbar-height) - 10px); padding-bottom: 24px; }
+ .usecase2 .content-area { -ms-overflow-style: none; scrollbar-width: none; }
+ .usecase2 .content-area::-webkit-scrollbar { display: none; }
+ .usecase2 .sidebar { -ms-overflow-style: none; scrollbar-width: none; }
+ .usecase2 .sidebar::-webkit-scrollbar { display: none; }
+ .usecase2 .container-fluid { padding-left: 24px; padding-right: 24px; padding-top: 0; }
+ .usecase2 .container-fluid { padding-left: 40px; padding-right: 40px; padding-top: 0; }
+ .usecase2 h1 { margin-top: 0; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.2px; color: #1f2937; }
+ .usecase2 h2 { margin-bottom: 10px; font-weight: 600; color: #1f2937; }
+ .usecase2 h3 { font-weight: 600; color: #1f2937; }
+ .usecase2 .content-area > .container-fluid > *:first-child { margin-top: 0 !important; }
+ .usecase2 .navbar-custom { min-height: var(--navbar-height); display: flex; align-items: center; margin: 0; top: 0; }
+ .usecase2 .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s; background: white; }
+ .usecase2 .card-custom:hover { 
+   transform: translateY(-2px); 
+   box-shadow: 0 8px 24px rgba(14,165,233,0.12), 0 2px 8px rgba(34,197,94,0.10);
+   border-color: #cfe2ff; 
+ }
+ .usecase2 .card:hover { 
+   border-color: #cfe2ff; 
+   box-shadow: 0 8px 24px rgba(14,165,233,0.12), 0 2px 8px rgba(34,197,94,0.10);
+ }
+ .usecase2 .card { border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 18px; }
+ .usecase2 .card > .card-header { background: #ffffff; border-bottom-color: #e5e7eb; }
+ .usecase2 .card .card-body { padding: 24px 24px; }
+ .usecase2 .card .card-body { padding: 28px 28px; }
+ .usecase2 .card .card-title { margin-bottom: 14px; }
+ .usecase2 .card.details-section .card-body { padding: 26px 26px; }
+ .usecase2 .card .card-title { margin-bottom: 12px; }
+ .usecase2 .quick-action-card { cursor: pointer; text-align: center; padding: 30px 20px; height: 100%; border: 1px solid #e5e7eb; border-radius: 14px; transition: box-shadow .25s, transform .25s; }
+ .usecase2 .quick-action-card { margin: 6px; }
+ .usecase2 .quick-action-card i { font-size: 3rem; color: #0072AA; margin-bottom: 15px; display: block; }
+ .usecase2 .quick-action-card h5 { color: #2c3e50; font-weight: 600; margin-bottom: 10px; }
+ .usecase2 .quick-action-card p { color: #7f8c8d; font-size: 0.9rem; }
+ .usecase2 .quick-action-card:hover { 
+   transform: translateY(-5px); 
+   box-shadow: 0 14px 34px rgba(14,165,233,0.18), 0 4px 10px rgba(34,197,94,0.12);
+   border-color: #dbeafe; 
+   background: #ffffff;
+ }
+.usecase2 .btn-primary,
+.usecase2 .btn-secondary,
+.usecase2 .btn-success {
+  background-color: #28c76f !important;
+  border-color: #28c76f !important;
+  color: #ffffff !important;
 }
+.usecase2 .btn-primary:hover,
+.usecase2 .btn-secondary:hover,
+.usecase2 .btn-success:hover {
+  background-color: #20b765 !important;
+  border-color: #20b765 !important;
+  color: #ffffff !important;
+}
+.usecase2 .btn-primary:focus,
+.usecase2 .btn-secondary:focus,
+.usecase2 .btn-success:focus { box-shadow: 0 0 0 0.2rem rgba(40, 199, 111, 0.35) !important; }
+.usecase2 .btn-primary:disabled,
+.usecase2 .btn-secondary:disabled,
+.usecase2 .btn-success:disabled {
+  background-color: #9fe5c3 !important;
+  border-color: #9fe5c3 !important;
+  color: #ffffff !important;
+}
+.usecase2 .btn-primary-custom { background: linear-gradient(135deg, #28c76f 0%, #20b765 100%); border: none; padding: 12px 25px; border-radius: 8px; font-weight: 600; transition: all 0.3s; color: white; }
+.usecase2 .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(32, 183, 101, 0.35); color: white; }
+.usecase2 .btn-back { 
+  background-color: #28c76f !important; 
+  border-color: #28c76f !important; 
+  color: #ffffff !important; 
+  padding: 8px 16px; 
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.usecase2 .btn-back:hover { 
+  background-color: #20b765 !important; 
+  border-color: #20b765 !important; 
+  color: #ffffff !important; 
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(32, 183, 101, 0.35);
+}
+.usecase2 .btn-back:focus { box-shadow: 0 0 0 0.2rem rgba(40, 199, 111, 0.35) !important; }
+.usecase2 .btn .bi { margin-right: 6px; }
+ .usecase2 .btn-secondary-custom { background-color: #6c757d !important; border-color: #6c757d !important; color: #ffffff !important; }
+ .usecase2 .btn-secondary-custom:hover { background-color: #5c636a !important; border-color: #565e64 !important; color: #ffffff !important; }
+ .usecase2 .btn-secondary-custom:focus { box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.35) !important; }
+ .usecase2 .status-badge { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; gap: 6px; }
+ .usecase2 .status-pending { background: #fffbe6; color: #d39e00; }
+ .usecase2 .status-under-review { background: #cfe2ff; color: #0072AA; }
+ .usecase2 .status-approved { background: #e6f7ed; color: #2d8c50; }
+ .usecase2 .status-rejected { background: #fde7e7; color: #b02a37; }
+ .usecase2 .status-more-info { background: #e7f1ff; color: #0b5ed7; }
+ .usecase2 .form-container { max-width: 700px; margin: 0 auto; }
+ .usecase2 .form-label { font-weight: 600; color: #2c3e50; margin-bottom: 8px; }
+ .usecase2 .form-control, .usecase2 .form-select { border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 12px 15px; font-size: 0.95rem; transition: all 0.2s; }
+ .usecase2 .form-control:focus, .usecase2 .form-select:focus { border-color: #0ea5e9; box-shadow: 0 0 0 0.2rem rgba(14,165,233,0.2); }
+ .usecase2 .search-box { border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; background: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+ .usecase2 .search-box:focus-within { border-color: #cfe2ff; box-shadow: 0 0 0 3px rgba(207,226,255,0.6); }
+ .usecase2 .form-control::placeholder { color: #9ca3af; }
+ .usecase2 .input-group .form-control { height: 48px; }
+ .usecase2 .input-group-text { background: #ffffff; border: 1.5px solid #e5e7eb; border-right: 0; }
+ .usecase2 .step-indicator { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+ .usecase2 .step-number { width: 40px; height: 40px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #95a5a6; transition: all 0.3s; }
+ .usecase2 .step-number.active { background: linear-gradient(135deg, #0072AA 0%, #21AA47 100%); color: white; }
+ .usecase2 .step-number.completed { background: #21AA47; color: white; }
+ .usecase2 .document-upload { border: 2px dashed #0072AA; border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: #f8f9fa; }
+ .usecase2 .document-upload:hover { background: #f0f4f8; border-color: #21AA47; transform: translateY(-2px); }
+ .usecase2 .document-upload i { font-size: 2.5rem; color: #0072AA; margin-bottom: 15px; display: block; }
+ .usecase2 .profile-header { background: white; color: #2c3e50; padding: 40px; margin-bottom: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: none; }
+ .usecase2 .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: #f0fdf4; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #15803d; margin: 0 auto 20px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 2px solid #dcfce7; }
+ .usecase2 .profile-field { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0; }
+ .usecase2 .profile-label { color: #7f8c8d; font-size: 0.9rem; font-weight: 600; margin-bottom: 5px; }
+ .usecase2 .profile-value { color: #2c3e50; font-size: 1.1rem; font-weight: 500; }
+ .usecase2 .profile-label, .usecase2 .summary-item label { color: #64748b; }
+.usecase2 .text-primary { color: #0ea5e9 !important; }
+.usecase2 .text-success { color: #22c55e !important; }
+.usecase2 .text-brand-blue { color: #0ea5e9 !important; }
+.usecase2 .text-brand-green { color: #22c55e !important; }
+.usecase2 a { color: #0ea5e9; text-decoration: none; }
+.usecase2 a:hover { color: #0284c7; text-decoration: underline; }
+ .usecase2 .alert { border: none; border-radius: 8px; padding: 15px 20px; }
+ .usecase2 .alert-success { background: #d1e7dd; color: #0f5132; }
+ .usecase2 .alert-danger { background: #f8d7da; color: #842029; }
+ .usecase2 .alert-warning { background: #fff3cd; color: #856404; }
+ .usecase2 .table-responsive { border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
+ .usecase2 table thead th { background: #f9fafb; font-weight: 600; color: #2c3e50; padding: 14px 14px; border-bottom: 1px solid #e5e7eb; }
+ .usecase2 table td { padding: 16px 16px; vertical-align: middle; }
+ .usecase2 table tbody tr { border-bottom: 1px solid #e5e7eb; transition: background 0.2s; }
+ .usecase2 table tbody tr:hover { background: #f3f6ff; }
+ .usecase2 table td .btn { padding: 6px 10px; }
+ .usecase2 .progress { background: #e0e0e0; border-radius: 10px; overflow: hidden; }
+ .usecase2 .progress-bar { background: linear-gradient(135deg, #0072AA 0%, #21AA47 100%); transition: width 0.3s; }
+ .usecase2 .no-applications { text-align: center; padding: 60px 20px; color: #7f8c8d; }
+ .usecase2 .no-applications i { font-size: 4rem; color: #bdc3c7; margin-bottom: 20px; display: block; }
+ .usecase2 .no-applications .btn-primary-custom { 
+   padding: 6px 14px; 
+   font-size: 0.875rem; 
+   font-weight: 500; 
+   border-radius: 6px;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+ }
+ .usecase2 .no-applications .btn-primary-custom .bi { 
+   font-size: 0.875rem; 
+   margin-right: 6px;
+ }
+ .usecase2 .summary-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e0e0e0; }
+ .usecase2 .summary-item label { color: #7f8c8d; font-weight: 500; }
+ .usecase2 .summary-item span { color: #2c3e50; font-weight: 600; }
+ .usecase2 .action-bar { border: 1px solid #e5e7eb; border-radius: 10px; }
+ .usecase2 .action-bar .btn { min-width: 180px; }
+ .usecase2 .action-bar .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+ .usecase2 .form-step, .usecase2 .fade-in { animation: fadeIn 0.3s ease-in; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+ .usecase2 .btn:focus, .usecase2 .form-control:focus, .usecase2 .form-select:focus { outline: 2px solid #0072AA; outline-offset: 2px; }
+@media (max-width: 992px) {
+  .usecase2 { overflow: auto; }
+  .usecase2.app-container { position: static; inset: auto; height: auto; }
+  .usecase2 .main-content { flex-direction: column; overflow: visible; height: auto !important; }
+  .usecase2 .content-area { order: 1; }
+  .usecase2 .content-area { overflow: visible !important; }
+  .usecase2 .dashboard-container { padding: 20px 15px; }
+  .usecase2 .step-indicator { flex-wrap: wrap; gap: 15px; justify-content: center; }
+  .usecase2 .profile-header { text-align: center; padding: 30px 20px; }
+  .usecase2 .content-area { padding-top: 10px; height: auto; }
+  .usecase2 .sidebar { width: 100%; height: auto; }
+  .usecase2 .sidebar .nav-link { font-size: 0.95rem; padding: 10px 12px; }
+}
+@media (max-width: 768px) {
+  .usecase2 .table-responsive table { font-size: 0.85rem; }
+  .usecase2 table th, .usecase2 table td { padding: 8px 6px; }
+  .usecase2 .status-badge { font-size: 0.75rem; padding: 4px 8px; }
+  .usecase2 .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+}
+@media (max-width: 576px) {
+  .usecase2 .dashboard-container { padding: 15px 10px; }
+  .usecase2 .profile-avatar { width: 80px; height: 80px; font-size: 2rem; }
+  .usecase2 .container-fluid { padding-left: 12px; padding-right: 12px; }
+  .usecase2 h1 { font-size: 1.5rem; }
+  .usecase2 h2 { font-size: 1.25rem; }
+  .usecase2 .quick-action-card { padding: 20px 14px; }
+  .usecase2 .table-responsive table { font-size: 0.8rem; }
+  .usecase2 table th, .usecase2 table td { padding: 6px 4px; }
+  .usecase2 .btn-sm { padding: 3px 6px; font-size: 0.7rem; }
+}
+ .usecase2 .dashboard-container { padding: 24px 48px 48px; min-height: 100%; }
